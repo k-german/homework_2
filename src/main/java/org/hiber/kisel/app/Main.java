@@ -16,20 +16,20 @@ public class Main {
 
         UserDao userDao = new UserDaoImpl();
 
-        User user = new User("UserOne", "one@mail.ru", 11);
+        User user = new User("UserO9ne", "o9ne@mail.ru", 11);
         userDao.save(user);
 
         User foundUser = userDao.findById(user.getId());
         System.out.println("Found User name: " + foundUser.getName());
 
-//        foundUser.setEmail("one-co3rrect@mail.ru");
+        foundUser.setEmail("one-co3rrect@mail.ru");
         userDao.update(foundUser);
 
         userDao.findAll().forEach(u -> System.out.println(u.getName() + " - " +
                 u.getAge() + " - " + u.getEmail() +
                 " - id:" + u.getId() + " - " + u.getCreatedAt()));
 
-//        userDao.delete(foundUser);
+        userDao.delete(foundUser);
 
         HibernateUtil.shutdown();
 

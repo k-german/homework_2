@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users_new")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -16,7 +16,7 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    //    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     private Integer age;
