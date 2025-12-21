@@ -16,7 +16,7 @@ public class MainForTest {
 
         UserDao userDao = new UserDaoImpl();
 
-        User user = new User("UserSix", "six@mail.ru", 55);
+        User user = new User("UserSeven", "seveneight@mail.ru", 55);
         try {
             log.info("Try to save the user.");
             userDao.save(user);
@@ -27,17 +27,17 @@ public class MainForTest {
                     user.getEmail());
         }
 
-//        User foundUser = userDao.findById(user.getId());
-//        System.out.println("Found User name: " + foundUser.getName());
+        User foundUser = userDao.findById(user.getId());
+        System.out.println("Found User name: " + foundUser.getName());
 
-//        foundUser.setEmail("one-co3rrect@mail.ru");
-//        userDao.update(foundUser);
+        foundUser.setEmail("oneone@mail.ru");
+        userDao.update(foundUser);
 
         userDao.findAll().forEach(u -> System.out.println(u.getName() + " - " +
                 u.getAge() + " - " + u.getEmail() +
                 " - id:" + u.getId() + " - " + u.getCreatedAt()));
 
-//        userDao.delete(foundUser);
+        userDao.delete(foundUser);
 
         HibernateUtil.shutdown();
 
