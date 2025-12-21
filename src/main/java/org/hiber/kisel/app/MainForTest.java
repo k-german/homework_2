@@ -4,13 +4,12 @@ import org.hiber.kisel.dao.UserDao;
 import org.hiber.kisel.dao.UserDaoImpl;
 import org.hiber.kisel.entity.User;
 import org.hiber.kisel.utils.HibernateUtil;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Main {
+public class MainForTest {
 
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
+    private static final Logger log = LoggerFactory.getLogger(MainForTest.class);
 
     public static void main(String[] args) {
 
