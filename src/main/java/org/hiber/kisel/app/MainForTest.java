@@ -16,7 +16,7 @@ public class MainForTest {
 
         UserDao userDao = new UserDaoImpl();
 
-        User user = new User("UserFive", "five@mail.ru", 55);
+        User user = new User("UserSix", "six@mail.ru", 55);
         try {
             log.info("Try to save the user.");
             userDao.save(user);
