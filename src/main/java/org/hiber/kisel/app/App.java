@@ -75,12 +75,32 @@ public class App {
         if (!email.isEmpty()) {
             user.setEmail(email);
         }
-        if (age != 0) {
-            user.setAge(age);
-        }
+        user.setAge(age);
 
         userDao.update(user);
         System.out.println("Данные пользователя перезаписаны.");
+    }
+
+    private static void deleteUser() {
+        int id = readIntInput("Введите ID для удаления пользователя: ");
+        User user = userDao.findById(id);
+        if (user == null) {
+            System.out.println("Пользователь не найден.");
+            return;
+        }
+        userDao.delete(user);
+        System.out.println("Пользователь удалён из БД.");
+    }
+
+    private static void listAllUsers() {
+        System.out.println("Список пользователей из БД:");
+        var users = userDao.findAll();
+        if (users.isEmpty()) {
+            System.out.println("Не найдено записей в БД.");
+            return;
+        }
+        users.forEach(u -> System.out.printf("%d - %s - %s - возраст: %d\n",
+                u.getId(), u.getName(), u.getEmail(), u.getAge()));
     }
 
     private static int readIntInput(String message) {
