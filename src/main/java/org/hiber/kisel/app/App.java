@@ -29,8 +29,8 @@ public class App {
                 case 0 -> exit = true;
                 case 1 -> createUser();
                 case 2 -> updateUser();
-//                case 3 -> deleteUser();
-//                case 4 -> listAllUsers();
+                case 3 -> deleteUser();
+                case 4 -> listAllUsers();
                 default -> printInputError();
             }
         }
