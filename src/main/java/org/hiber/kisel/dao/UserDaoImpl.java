@@ -1,5 +1,6 @@
 package org.hiber.kisel.dao;
 
+import org.hiber.kisel.exceptions.EmailAlreadyExistsException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hiber.kisel.utils.HibernateUtil;
@@ -10,6 +11,11 @@ import java.util.List;
 public class UserDaoImpl implements UserDao{
     @Override
     public void save(User user) {
+        String email = user.getEmail();
+        if ((findByEmail(email)) != null) {
+            throw new EmailAlreadyExistsException(email);
+        }
+
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -51,6 +57,15 @@ public class UserDaoImpl implements UserDao{
     public User findById(Integer id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.find(User.class, id);
+        }
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("from User u where u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .uniqueResult();
         }
     }
 
