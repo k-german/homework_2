@@ -1,5 +1,6 @@
 package org.hiber.kisel.utils;
 
+import org.hiber.kisel.entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public final class HibernateUtil {
 
             return new Configuration()
                     .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(User.class)
                     .buildSessionFactory();
 
         } catch (Exception ex) {
