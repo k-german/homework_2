@@ -1,24 +1,31 @@
 package org.hiber.kisel.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Table(name = "users")
 public class User {
 
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Setter
     @Column(nullable = false)
     private String name;
 
+    @Setter
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Setter
     private Integer age;
 
     @CreationTimestamp
@@ -32,41 +39,5 @@ public class User {
         this.name = name;
         this.email = email;
         this.age = age;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 }

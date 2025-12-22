@@ -1,5 +1,6 @@
 package org.hiber.kisel.utils;
 
+import lombok.Getter;
 import org.hiber.kisel.entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -11,6 +12,7 @@ public final class HibernateUtil {
     private static final Logger log =
             LoggerFactory.getLogger(HibernateUtil.class);
 
+    @Getter
     private static final SessionFactory sessionFactory = buildSessionFactory();
 
     private HibernateUtil() {
@@ -29,10 +31,6 @@ public final class HibernateUtil {
             log.error("Hibernate SessionFactory init failed", ex);
             throw new ExceptionInInitializerError(ex);
         }
-    }
-
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 
     public static void shutdown() {
