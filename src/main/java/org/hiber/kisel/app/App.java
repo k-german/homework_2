@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class App {
 
-    private Logger logger = LoggerFactory.getLogger(App.class);
+    private final Logger logger = LoggerFactory.getLogger(App.class);
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final UserDao userDao = new UserDaoImpl();
@@ -43,30 +43,38 @@ public class App {
 
         HibernateUtil.shutdown();
         System.out.println("Работа завершена.");
+        logger.info("The application is ending.");
     }
 
     private void createUser() {
+        logger.info("createUser start");
         System.out.println("Введите данные.");
         String name = readStringInput("Имя: ");
         String email = readStringInput("Email: ");
         int age = readIntInput("Возраст: ");
 
         User user = new User(name, email, age);
+        logger.info("new user created\ntrying to save user to DB");
 
         try {
             userDao.save(user);
             System.out.printf("Пользователь добавлен в БД с ID: %s", user.getId());
+            logger.info("Successful saving user to DB");
         } catch (EmailAlreadyExistsException e) {
             System.out.printf(e.getMessage());
             System.out.println("\nОшибка записи в БД.");
+            logger.info("Saving user to DB Fails");
         }
     }
 
     private void updateUser() {
+        logger.info("updateUser start");
         System.out.println("Обновление данных пользователя.");
         int id = readIntInput("Введите ID пользователя для обновления: ");
+        logger.info("Entered id: {}", id);
         User user = userDao.findById(id);
         if (user == null) {
+            logger.info("User was not found");
             System.out.println("Пользователь не найден.");
             return;
         }
@@ -82,27 +90,34 @@ public class App {
             user.setEmail(email);
         }
         user.setAge(age);
-
+        logger.info("Updating user");
         userDao.update(user);
         System.out.println("Данные пользователя перезаписаны.");
+        logger.info("User info updated");
     }
 
     private void deleteUser() {
+        logger.info("deleteUser start");
         int id = readIntInput("Введите ID для удаления пользователя: ");
+        logger.info("Entered id: {}", id);
         User user = userDao.findById(id);
         if (user == null) {
+            logger.info("User was not found");
             System.out.println("Пользователь не найден.");
             return;
         }
         userDao.delete(user);
         System.out.println("Пользователь удалён из БД.");
+        logger.info("User id {} deleted", id);
     }
 
     private void listAllUsers() {
+        logger.info("listAllUsers start");
         System.out.println("Список пользователей из БД:");
         var users = userDao.findAll();
         if (users.isEmpty()) {
             System.out.println("Не найдено записей в БД.");
+            logger.info("DB empty");
             return;
         }
         users.forEach(u -> System.out.printf("%d - %s - %s - возраст: %d\n",
@@ -110,6 +125,7 @@ public class App {
     }
 
     private int readIntInput(String message) {
+        logger.info("readIntInput start");
         while (true) {
             try {
                 System.out.print(message);
@@ -121,6 +137,7 @@ public class App {
     }
 
     private String readStringInput(String message) {
+        logger.info("readStringInput start");
         System.out.print(message);
         return scanner.nextLine().trim();
     }
@@ -135,6 +152,7 @@ public class App {
     }
 
     private void printInputError() {
+        logger.info("Input error");
         System.out.println("Ввод нераспознан, повторите.");
     }
 
