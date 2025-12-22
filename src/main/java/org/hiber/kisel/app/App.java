@@ -5,10 +5,14 @@ import org.hiber.kisel.dao.UserDaoImpl;
 import org.hiber.kisel.entity.User;
 import org.hiber.kisel.exceptions.EmailAlreadyExistsException;
 import org.hiber.kisel.utils.HibernateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Scanner;
 
 public class App {
+
+    private Logger logger = LoggerFactory.getLogger(App.class);
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final UserDao userDao = new UserDaoImpl();
@@ -22,8 +26,10 @@ public class App {
     private void start() {
         boolean exit = false;
         while (!exit) {
+            logger.info("Show main menu");
             printMenu();
             int choice = readIntInput("Введите 0 - 4: ");
+            logger.info("User input {}", choice);
 
             switch (choice) {
                 case 0 -> exit = true;
@@ -40,6 +46,7 @@ public class App {
     }
 
     private static void createUser() {
+        logger.info("createUser started");
         System.out.println("Введите данные.");
         String name = readStringInput("Имя: ");
         String email = readStringInput("Email: ");

@@ -16,13 +16,13 @@ public class MainForTest {
 
         UserDao userDao = new UserDaoImpl();
 
-        User user = new User("UserSeven", "seveneight@mail.ru", 55);
+        User user = new User("UserSeven", "sevenраeight@mail.ru", 55);
         try {
-            log.info("Try to save the user.");
+            log.debug("Try to save the user.");
             userDao.save(user);
-            log.info("Successful saving.");
+            log.debug("Successful saving.");
         } catch (EmailAlreadyExistsException e) {
-            log.info("Saving fails. Exception message: {}", e.getMessage());
+            log.debug("Saving fails. Exception message: {}", e.getMessage());
             System.out.printf("\n**- User with the same email \"%s\" already exists in the database table. -**\n\n",
                     user.getEmail());
         }
@@ -41,14 +41,14 @@ public class MainForTest {
 
         HibernateUtil.shutdown();
 
-//        log.info("START");
+//        log.debug("START");
 //
 //        try (Session session = HibernateUtil
 //                .getSessionFactory()
 //                .openSession()) {
 //
 //            session.beginTransaction();
-//            log.info("Hibernate session opened - success");
+//            log.debug("Hibernate session opened - success");
 //            session.getTransaction().commit();
 //
 //        } catch (Exception e) {
