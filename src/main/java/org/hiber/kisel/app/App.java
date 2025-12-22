@@ -5,10 +5,14 @@ import org.hiber.kisel.dao.UserDaoImpl;
 import org.hiber.kisel.entity.User;
 import org.hiber.kisel.exceptions.EmailAlreadyExistsException;
 import org.hiber.kisel.utils.HibernateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Scanner;
 
 public class App {
+
+    private final Logger logger = LoggerFactory.getLogger(App.class);
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final UserDao userDao = new UserDaoImpl();
@@ -22,8 +26,10 @@ public class App {
     private void start() {
         boolean exit = false;
         while (!exit) {
+            logger.info("Show main menu");
             printMenu();
             int choice = readIntInput("Введите 0 - 4: ");
+            logger.info("User input {}", choice);
 
             switch (choice) {
                 case 0 -> exit = true;
@@ -37,30 +43,38 @@ public class App {
 
         HibernateUtil.shutdown();
         System.out.println("Работа завершена.");
+        logger.info("The application is ending.");
     }
 
-    private static void createUser() {
+    private void createUser() {
+        logger.info("createUser start");
         System.out.println("Введите данные.");
         String name = readStringInput("Имя: ");
         String email = readStringInput("Email: ");
         int age = readIntInput("Возраст: ");
 
         User user = new User(name, email, age);
+        logger.info("new user created\ntrying to save user to DB");
 
         try {
             userDao.save(user);
             System.out.printf("Пользователь добавлен в БД с ID: %s", user.getId());
+            logger.info("Successful saving user to DB");
         } catch (EmailAlreadyExistsException e) {
             System.out.printf(e.getMessage());
             System.out.println("\nОшибка записи в БД.");
+            logger.info("Saving user to DB Fails");
         }
     }
 
-    private static void updateUser() {
+    private void updateUser() {
+        logger.info("updateUser start");
         System.out.println("Обновление данных пользователя.");
         int id = readIntInput("Введите ID пользователя для обновления: ");
+        logger.info("Entered id: {}", id);
         User user = userDao.findById(id);
         if (user == null) {
+            logger.info("User was not found");
             System.out.println("Пользователь не найден.");
             return;
         }
@@ -76,34 +90,42 @@ public class App {
             user.setEmail(email);
         }
         user.setAge(age);
-
+        logger.info("Updating user");
         userDao.update(user);
         System.out.println("Данные пользователя перезаписаны.");
+        logger.info("User info updated");
     }
 
-    private static void deleteUser() {
+    private void deleteUser() {
+        logger.info("deleteUser start");
         int id = readIntInput("Введите ID для удаления пользователя: ");
+        logger.info("Entered id: {}", id);
         User user = userDao.findById(id);
         if (user == null) {
+            logger.info("User was not found");
             System.out.println("Пользователь не найден.");
             return;
         }
         userDao.delete(user);
         System.out.println("Пользователь удалён из БД.");
+        logger.info("User id {} deleted", id);
     }
 
-    private static void listAllUsers() {
+    private void listAllUsers() {
+        logger.info("listAllUsers start");
         System.out.println("Список пользователей из БД:");
         var users = userDao.findAll();
         if (users.isEmpty()) {
             System.out.println("Не найдено записей в БД.");
+            logger.info("DB empty");
             return;
         }
         users.forEach(u -> System.out.printf("%d - %s - %s - возраст: %d\n",
                 u.getId(), u.getName(), u.getEmail(), u.getAge()));
     }
 
-    private static int readIntInput(String message) {
+    private int readIntInput(String message) {
+        logger.info("readIntInput start");
         while (true) {
             try {
                 System.out.print(message);
@@ -114,12 +136,13 @@ public class App {
         }
     }
 
-    private static String readStringInput(String message) {
+    private String readStringInput(String message) {
+        logger.info("readStringInput start");
         System.out.print(message);
         return scanner.nextLine().trim();
     }
 
-    private static void printMenu() {
+    private void printMenu() {
         System.out.println("\nВыбрать дальнейшие действия: ");
         System.out.println("1. Создать пользователя.");
         System.out.println("2. Обновить данные пользователя.");
@@ -128,7 +151,8 @@ public class App {
         System.out.println("0. Выход.");
     }
 
-    private static void printInputError() {
+    private void printInputError() {
+        logger.info("Input error");
         System.out.println("Ввод нераспознан, повторите.");
     }
 
