@@ -45,8 +45,7 @@ public class App {
         System.out.println("Работа завершена.");
     }
 
-    private static void createUser() {
-        logger.info("createUser started");
+    private void createUser() {
         System.out.println("Введите данные.");
         String name = readStringInput("Имя: ");
         String email = readStringInput("Email: ");
@@ -63,7 +62,7 @@ public class App {
         }
     }
 
-    private static void updateUser() {
+    private void updateUser() {
         System.out.println("Обновление данных пользователя.");
         int id = readIntInput("Введите ID пользователя для обновления: ");
         User user = userDao.findById(id);
@@ -88,7 +87,7 @@ public class App {
         System.out.println("Данные пользователя перезаписаны.");
     }
 
-    private static void deleteUser() {
+    private void deleteUser() {
         int id = readIntInput("Введите ID для удаления пользователя: ");
         User user = userDao.findById(id);
         if (user == null) {
@@ -99,7 +98,7 @@ public class App {
         System.out.println("Пользователь удалён из БД.");
     }
 
-    private static void listAllUsers() {
+    private void listAllUsers() {
         System.out.println("Список пользователей из БД:");
         var users = userDao.findAll();
         if (users.isEmpty()) {
@@ -110,7 +109,7 @@ public class App {
                 u.getId(), u.getName(), u.getEmail(), u.getAge()));
     }
 
-    private static int readIntInput(String message) {
+    private int readIntInput(String message) {
         while (true) {
             try {
                 System.out.print(message);
@@ -121,12 +120,12 @@ public class App {
         }
     }
 
-    private static String readStringInput(String message) {
+    private String readStringInput(String message) {
         System.out.print(message);
         return scanner.nextLine().trim();
     }
 
-    private static void printMenu() {
+    private void printMenu() {
         System.out.println("\nВыбрать дальнейшие действия: ");
         System.out.println("1. Создать пользователя.");
         System.out.println("2. Обновить данные пользователя.");
@@ -135,7 +134,7 @@ public class App {
         System.out.println("0. Выход.");
     }
 
-    private static void printInputError() {
+    private void printInputError() {
         System.out.println("Ввод нераспознан, повторите.");
     }
 
