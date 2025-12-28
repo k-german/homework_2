@@ -4,10 +4,15 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hiber.utils.HibernateUtil;
 import org.hiber.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class UserDaoImpl implements UserDao{
+public class UserDaoImpl implements UserDao {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserDaoImpl.class);
+
     @Override
     public void save(User user) {
         Transaction transaction = null;
@@ -15,8 +20,10 @@ public class UserDaoImpl implements UserDao{
             transaction = session.beginTransaction();
             session.persist(user);
             transaction.commit();
+            logger.info("\"save(User user)\" - user saved successfully: {}", user);
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
+            logger.error("\"save(User user)\" failed: {}", user, e);
             throw e;
         }
     }
@@ -28,8 +35,10 @@ public class UserDaoImpl implements UserDao{
             transaction = session.beginTransaction();
             session.merge(user);
             transaction.commit();
+            logger.info("\"update(User user)\" - user updated successfully: {}", user);
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
+            logger.error("\"update(User user)\" failed: {}", user, e);
             throw e;
         }
     }
@@ -41,8 +50,10 @@ public class UserDaoImpl implements UserDao{
             transaction = session.beginTransaction();
             session.remove(user);
             transaction.commit();
+            logger.info("\"delete(User user)\" - user deleted successfully: {}", user);
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
+            logger.error("\"delete(User user)\" failed: {}", user, e);
             throw e;
         }
     }
@@ -52,16 +63,18 @@ public class UserDaoImpl implements UserDao{
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.createQuery("DELETE FROM User u WHERE u.id = :id", Integer.class)
+            int count = session.createQuery("DELETE FROM User u WHERE u.id = :id", Integer.class)
                     .setParameter("id", id)
                     .executeUpdate();
             transaction.commit();
+            logger.info("\"deleteById(Integer id)\" - successfully. Id = {}, deleted elements: {}",
+                    id, count);
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
+            logger.error("\"deleteById(Integer id)\" failed: {}", id, e);
             throw e;
         }
     }
-
 
     @Override
     public User findById(Integer id) {

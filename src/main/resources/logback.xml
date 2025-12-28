@@ -3,47 +3,56 @@
 
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+
+    <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>logs/info%i.log</fileNamePattern>
             <minIndex>1</minIndex>
-            <maxIndex>1</maxIndex>
+            <maxIndex>2</maxIndex>
         </rollingPolicy>
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <maxFileSize>1MB</maxFileSize>
         </triggeringPolicy>
         <encoder>
-            <pattern>
-                %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
-            </pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <appender name="HIBERNATE"
+    <appender name="FILE_HIBERNATE"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/hibernate.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>logs/hibernate%i.log</fileNamePattern>
             <minIndex>1</minIndex>
-            <maxIndex>1</maxIndex>
+            <maxIndex>2</maxIndex>
         </rollingPolicy>
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <maxFileSize>1MB</maxFileSize>
         </triggeringPolicy>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!--            <logger name="org.hibernate.SQL" level="INFO"/>-->
-    <!--        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>-->
-
-    <logger name="org.hibernate" level="INFO" additivity="false">
-        <appender-ref ref="HIBERNATE"/>
+    <logger name="org.hiber.services" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_INFO"/>
     </logger>
 
-    <root level="INFO">
-        <appender-ref ref="FILE"/>
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_HIBERNATE"/>
+    </logger>
+
+    <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">
+        <appender-ref ref="FILE_HIBERNATE"/>
+    </logger>
+
+    <logger name="org.hibernate" level="INFO" additivity="false">
+        <appender-ref ref="FILE_HIBERNATE"/>
+    </logger>
+
+    <root level="Error">
+        <appender-ref ref="FILE_INFO"/>
     </root>
 </configuration>
