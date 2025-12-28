@@ -2,7 +2,7 @@ package org.hiber.app;
 
 import org.hiber.dao.UserDaoImpl;
 import org.hiber.entity.User;
-import org.hiber.exceptions.EmailAlreadyExistsException;
+import org.hiber.services.exceptions.EmailAlreadyExistsException;
 import org.hiber.services.UserService;
 import org.hiber.services.UserServiceImpl;
 import org.hiber.utils.HibernateUtil;

@@ -1,6 +1,5 @@
 package org.hiber.dao;
 
-import org.hiber.exceptions.EmailAlreadyExistsException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hiber.utils.HibernateUtil;

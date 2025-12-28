@@ -2,7 +2,9 @@ package org.hiber.services;
 
 import org.hiber.dao.UserDao;
 import org.hiber.entity.User;
-import org.hiber.exceptions.EmailAlreadyExistsException;
+import org.hiber.services.exceptions.BusinessException;
+import org.hiber.services.exceptions.EmailAlreadyExistsException;
+import org.hiber.services.exceptions.UserNotFoundException;
 
 import java.util.List;
 import java.util.Objects;
@@ -44,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
         User existing = userDao.findById(user.getId());
         if (existing == null) {
-            throw new IllegalArgumentException("User not found");
+            throw new UserNotFoundException(user.getId());
         }
 
         if (!Objects.equals(existing.getEmail(), user.getEmail())
@@ -61,28 +63,27 @@ public class UserServiceImpl implements UserService {
 
         User user = userDao.findById(id);
         if (user == null) {
-            throw new IllegalArgumentException("User not found");
+            throw new UserNotFoundException(id);
         }
 
         userDao.delete(user);
     }
 
-
     private void validateUser(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("User must not be null");
+            throw new BusinessException("User must not be null");
         }
         if (user.getName() == null || user.getName().isBlank()) {
-            throw new IllegalArgumentException("Name is required");
+            throw new BusinessException("Name is required");
         }
         if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
+            throw new BusinessException("Email is required");
         }
     }
 
     private void validateId(Integer id) {
         if (id == null || id <= 0) {
-            throw new IllegalArgumentException("Invalid id");
+            throw new BusinessException("Invalid id");
         }
     }
 }
