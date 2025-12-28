@@ -3,6 +3,7 @@ package org.hiber.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -19,9 +20,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NonNull
     @Column(nullable = false)
     private String name;
 
+    @NonNull
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -31,7 +34,7 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public User(String name, String email, Integer age) {
+    public User(@NonNull String name, @NonNull String email, Integer age) {
         this.name = name;
         this.email = email;
         this.age = age;
