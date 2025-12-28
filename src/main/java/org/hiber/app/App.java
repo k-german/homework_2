@@ -31,7 +31,7 @@ public class App {
             logger.info("Show main menu");
             printMenu();
             int choice = readIntInput("Введите 0 - 4: ");
-            logger.info("User input {}", choice);
+            logger.info("User input menu choice: {}", choice);
 
             switch (choice) {
                 case 0 -> exit = true;
@@ -55,17 +55,19 @@ public class App {
         String email = readStringInput("Email: ");
         int age = readIntInput("Возраст: ");
 
+        logger.info("user creation started: name={}, email={}, age={}", name, email, age);
         User user = new User(name, email, age);
         logger.info("new user created\ntrying to save user to DB");
 
         try {
             userService.create(user);
             System.out.printf("Пользователь добавлен в БД с ID: %s", user.getId());
-            logger.info("Successful saving user to DB");
+            logger.info("Successful saving user to DB: id={}, email={}, age={}",
+                    user.getId(), user.getEmail(), user.getAge());
         } catch (EmailAlreadyExistsException e) {
             System.out.printf(e.getMessage());
             System.out.println("\nОшибка записи в БД.");
-            logger.info("Saving user to DB Fails");
+            logger.warn("Saving user to DB Fails: email={}\nException: {}", user.getEmail(), e.getMessage());
         }
     }
 
@@ -73,10 +75,10 @@ public class App {
         logger.info("updateUser start");
         System.out.println("Обновление данных пользователя.");
         int id = readIntInput("Введите ID пользователя для обновления: ");
-        logger.info("Entered id: {}", id);
+        logger.info("User entered id: {}", id);
         User user = userService.findById(id);
         if (user == null) {
-            logger.info("User was not found");
+            logger.info("User not found by id={}", id);
             System.out.println("Пользователь не найден.");
             return;
         }
@@ -104,7 +106,7 @@ public class App {
         logger.info("Entered id: {}", id);
         User user = userService.findById(id);
         if (user == null) {
-            logger.info("User was not found");
+            logger.info("User not found by id={}", id);
             System.out.println("Пользователь не найден.");
             return;
         }
@@ -154,7 +156,7 @@ public class App {
     }
 
     private void printInputError() {
-        logger.info("Input error");
+        logger.warn("Input error, expecting int");
         System.out.println("Ввод нераспознан, повторите.");
     }
 

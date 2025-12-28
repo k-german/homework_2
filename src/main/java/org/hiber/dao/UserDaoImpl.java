@@ -44,21 +44,6 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void delete(User user) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            session.remove(user);
-            transaction.commit();
-            logger.info("\"delete(User user)\" - user deleted successfully: {}", user);
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            logger.error("\"delete(User user)\" failed: {}", user, e);
-            throw e;
-        }
-    }
-
-    @Override
     public void deleteById(Integer id) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

@@ -89,11 +89,11 @@ public class UserServiceImpl implements UserService {
             logger.error("validateUser(User user) - User == null");
             throw new BusinessException("User must not be null");
         }
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (user.getName().isBlank()) {
             logger.error("validateUser(User user) - user.getName() == (null or empty)");
             throw new BusinessException("Name is required");
         }
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
+        if (user.getEmail().isBlank()) {
             logger.error("validateUser(User user) - user.getEmail() == (null or empty)");
             throw new BusinessException("Email is required");
         }
