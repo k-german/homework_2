@@ -4,7 +4,6 @@ import org.hiber.dao.UserDao;
 import org.hiber.entity.User;
 import org.hiber.services.exceptions.BusinessException;
 import org.hiber.services.exceptions.EmailAlreadyExistsException;
-import org.hiber.services.exceptions.UserNotFoundException;
 
 import java.util.List;
 import java.util.Objects;
@@ -44,13 +43,8 @@ public class UserServiceImpl implements UserService {
         validateUser(user);
         validateId(user.getId());
 
-        User existing = userDao.findById(user.getId());
-        if (existing == null) {
-            throw new UserNotFoundException(user.getId());
-        }
-
-        if (!Objects.equals(existing.getEmail(), user.getEmail())
-                && userDao.findByEmail(user.getEmail()) != null) {
+        User userWithSameEmail = userDao.findByEmail(user.getEmail());
+        if (userWithSameEmail != null && !Objects.equals(userWithSameEmail.getId(), user.getId())) {
             throw new EmailAlreadyExistsException(user.getEmail());
         }
 
@@ -61,12 +55,11 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Integer id) {
         validateId(id);
 
-        User user = userDao.findById(id);
-        if (user == null) {
-            throw new UserNotFoundException(id);
+        try {
+            userDao.deleteById(id);
+        } catch (Exception e) {
+            //TODO: add exception or logging
         }
-
-        userDao.delete(user);
     }
 
     private void validateUser(User user) {

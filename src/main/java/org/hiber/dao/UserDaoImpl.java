@@ -48,6 +48,22 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
+    public void deleteById(Integer id) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.createQuery("DELETE FROM User u WHERE u.id = :id", Integer.class)
+                    .setParameter("id", id)
+                    .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw e;
+        }
+    }
+
+
+    @Override
     public User findById(Integer id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.find(User.class, id);
