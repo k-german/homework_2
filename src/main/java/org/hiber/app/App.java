@@ -1,9 +1,10 @@
 package org.hiber.app;
 
-import org.hiber.dao.UserDao;
 import org.hiber.dao.UserDaoImpl;
 import org.hiber.entity.User;
 import org.hiber.exceptions.EmailAlreadyExistsException;
+import org.hiber.services.UserService;
+import org.hiber.services.UserServiceImpl;
 import org.hiber.utils.HibernateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,8 @@ public class App {
     private final Logger logger = LoggerFactory.getLogger(App.class);
 
     private static final Scanner scanner = new Scanner(System.in);
-    private static final UserDao userDao = new UserDaoImpl();
+    private static final UserService userService =
+            new UserServiceImpl(new UserDaoImpl());
 
     public static void main(String[] args) {
         App menu = new App();
@@ -57,7 +59,7 @@ public class App {
         logger.info("new user created\ntrying to save user to DB");
 
         try {
-            userDao.save(user);
+            userService.create(user);
             System.out.printf("Пользователь добавлен в БД с ID: %s", user.getId());
             logger.info("Successful saving user to DB");
         } catch (EmailAlreadyExistsException e) {
@@ -72,7 +74,7 @@ public class App {
         System.out.println("Обновление данных пользователя.");
         int id = readIntInput("Введите ID пользователя для обновления: ");
         logger.info("Entered id: {}", id);
-        User user = userDao.findById(id);
+        User user = userService.findById(id);
         if (user == null) {
             logger.info("User was not found");
             System.out.println("Пользователь не найден.");
@@ -91,7 +93,7 @@ public class App {
         }
         user.setAge(age);
         logger.info("Updating user");
-        userDao.update(user);
+        userService.update(user);
         System.out.println("Данные пользователя перезаписаны.");
         logger.info("User info updated");
     }
@@ -100,13 +102,13 @@ public class App {
         logger.info("deleteUser start");
         int id = readIntInput("Введите ID для удаления пользователя: ");
         logger.info("Entered id: {}", id);
-        User user = userDao.findById(id);
+        User user = userService.findById(id);
         if (user == null) {
             logger.info("User was not found");
             System.out.println("Пользователь не найден.");
             return;
         }
-        userDao.delete(user);
+        userService.deleteById(id);
         System.out.println("Пользователь удалён из БД.");
         logger.info("User id {} deleted", id);
     }
@@ -114,7 +116,7 @@ public class App {
     private void listAllUsers() {
         logger.info("listAllUsers start");
         System.out.println("Список пользователей из БД:");
-        var users = userDao.findAll();
+        var users = userService.findAll();
         if (users.isEmpty()) {
             System.out.println("Не найдено записей в БД.");
             logger.info("DB empty");

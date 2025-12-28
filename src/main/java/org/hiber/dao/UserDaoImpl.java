@@ -11,11 +11,6 @@ import java.util.List;
 public class UserDaoImpl implements UserDao{
     @Override
     public void save(User user) {
-        String email = user.getEmail();
-        if ((findByEmail(email)) != null) {
-            throw new EmailAlreadyExistsException(email);
-        }
-
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
