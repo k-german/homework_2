@@ -1,4 +1,4 @@
-package org.hiber.kisel.entity;
+package org.hiber.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

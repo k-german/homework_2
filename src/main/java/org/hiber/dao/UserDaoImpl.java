@@ -1,10 +1,10 @@
-package org.hiber.kisel.dao;
+package org.hiber.dao;
 
-import org.hiber.kisel.exceptions.EmailAlreadyExistsException;
+import org.hiber.exceptions.EmailAlreadyExistsException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hiber.kisel.utils.HibernateUtil;
-import org.hiber.kisel.entity.User;
+import org.hiber.utils.HibernateUtil;
+import org.hiber.entity.User;
 
 import java.util.List;
 

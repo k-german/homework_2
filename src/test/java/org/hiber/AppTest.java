@@ -1,4 +1,4 @@
-package org.hiber.kisel;
+package org.hiber;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

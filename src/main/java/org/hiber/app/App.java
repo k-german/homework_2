@@ -1,10 +1,10 @@
-package org.hiber.kisel.app;
+package org.hiber.app;
 
-import org.hiber.kisel.dao.UserDao;
-import org.hiber.kisel.dao.UserDaoImpl;
-import org.hiber.kisel.entity.User;
-import org.hiber.kisel.exceptions.EmailAlreadyExistsException;
-import org.hiber.kisel.utils.HibernateUtil;
+import org.hiber.dao.UserDao;
+import org.hiber.dao.UserDaoImpl;
+import org.hiber.entity.User;
+import org.hiber.exceptions.EmailAlreadyExistsException;
+import org.hiber.utils.HibernateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

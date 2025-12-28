@@ -1,7 +1,7 @@
-package org.hiber.kisel.utils;
+package org.hiber.utils;
 
 import lombok.Getter;
-import org.hiber.kisel.entity.User;
+import org.hiber.entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;

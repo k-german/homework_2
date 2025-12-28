@@ -1,4 +1,4 @@
-package org.hiber.kisel.exceptions;
+package org.hiber.exceptions;
 
 public class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String email) {

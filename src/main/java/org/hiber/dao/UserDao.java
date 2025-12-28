@@ -1,6 +1,6 @@
-package org.hiber.kisel.dao;
+package org.hiber.dao;
 
-import org.hiber.kisel.entity.User;
+import org.hiber.entity.User;
 
 import java.util.List;
 
