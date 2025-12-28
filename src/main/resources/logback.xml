@@ -18,6 +18,27 @@
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>logs/debug%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>2</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>1MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
     </appender>
 
     <appender name="FILE_HIBERNATE"
@@ -36,8 +57,18 @@
         </encoder>
     </appender>
 
-    <logger name="org.hiber.services" level="DEBUG" additivity="false">
+    <logger name="org.hiber" level="INFO" additivity="false">
         <appender-ref ref="FILE_INFO"/>
+    </logger>
+
+    <!--    <logger name="org.hiber.services" level="INFO" additivity="false">-->
+    <logger name="org.hiber.services" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_DEBUG"/>
+    </logger>
+
+
+    <logger name="org.hibernate" level="INFO" additivity="false">
+        <appender-ref ref="FILE_HIBERNATE"/>
     </logger>
 
     <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
@@ -45,10 +76,6 @@
     </logger>
 
     <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">
-        <appender-ref ref="FILE_HIBERNATE"/>
-    </logger>
-
-    <logger name="org.hibernate" level="INFO" additivity="false">
         <appender-ref ref="FILE_HIBERNATE"/>
     </logger>
 
