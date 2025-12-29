@@ -8,6 +8,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
@@ -110,19 +112,54 @@ public class UserDaoIT {
 
     @Test
     void testFindByEmail_Success() {
-        User user = new User("Bob", "bob@example.com", 25);
+        User user = new User("TestUser", "testEmail@example.com", 25);
         userDao.save(user);
-        User fromDb = userDao.findByEmail("bob@example.com");
+        User fromDb = userDao.findByEmail("testEmail@example.com");
         assertNotNull(fromDb);
-        assertEquals("Bob", fromDb.getName());
+        assertEquals("TestUser", fromDb.getName());
         assertEquals(25, fromDb.getAge());
     }
 
     // not found returns null
     @Test
     void testFindByEmail_NotFound() {
-        User fromDb = userDao.findByEmail("nonexistent@example.com");
+        User fromDb = userDao.findByEmail("nonExistent@example.com");
         assertNull(fromDb);
+    }
+
+    @Test
+    void testFindAll_EmptyTable() {
+        var users = userDao.findAll();
+        assertNotNull(users);
+        assertTrue(users.isEmpty(), "Expected: empty list ");
+    }
+
+    @Test
+    void testFindAll_OneUser() {
+        User user = new User("SingleUser", "single@test.com", 22);
+        userDao.save(user);
+
+        var users = userDao.findAll();
+        assertEquals(1, users.size());
+        assertEquals("SingleUser", users.get(0).getName());
+    }
+
+    @Test
+    void testFindAll_MultipleUsers() {
+        User user1 = new User("User1", "u1@test.com", 25);
+        User user2 = new User("User2", "u2@test.com", 30);
+        User user3 = new User("User3", "u3@test.com", 33);
+        userDao.save(user1);
+        userDao.save(user2);
+        userDao.save(user3);
+
+        var users = userDao.findAll();
+        assertEquals(3, users.size());
+
+        List<String> emails = users.stream().map(User::getEmail).toList();
+        assertTrue(emails.contains("u1@test.com"));
+        assertTrue(emails.contains("u2@test.com"));
+        assertTrue(emails.contains("u3@test.com"));
     }
 
 }
