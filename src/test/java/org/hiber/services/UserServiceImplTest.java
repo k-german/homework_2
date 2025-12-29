@@ -122,5 +122,47 @@ class UserServiceImplTest {
         verify(userDao, times(1)).findById(2);
     }
 
+    @Test
+    void update_nullUser_throwsBusinessException() {
+        assertThrows(BusinessException.class, () -> userService.update(null));
+        verify(userDao, never()).update(any());
+    }
+
+    @Test
+    void update_userWithEmptyNameOrEmail_throwsBusinessException() {
+        User userEmptyName = new User("", "testemail@example.com", 25);
+        userEmptyName.setId(1);
+        User userEmptyEmail = new User("Username", "", 25);
+        userEmptyEmail.setId(1);
+        assertThrows(BusinessException.class, () -> userService.update(userEmptyName));
+        assertThrows(BusinessException.class, () -> userService.update(userEmptyEmail));
+        verify(userDao, never()).update(any());
+    }
+
+    @Test
+    void update_userWithInvalidId_throwsBusinessException() { // validateId tested
+        User user = new User("Username", "testemail@example.com", 25);
+        user.setId(0);
+        assertThrows(BusinessException.class, () -> userService.update(user));
+        verify(userDao, never()).update(any());
+    }
+
+    @Test
+    void update_daoThrowsException_propagatesException() {
+        User user = new User("Username", "testemail@example.com", 25);
+        user.setId(1);
+        doThrow(new RuntimeException("DB error")).when(userDao).update(user);
+        assertThrows(RuntimeException.class, () -> userService.update(user));
+        verify(userDao, times(1)).update(user);
+    }
+
+    @Test
+    void update_validUser_callsDaoUpdateOnce() {
+        User user = new User("Username", "testemail@example.com", 25);
+        user.setId(1);
+        doNothing().when(userDao).update(user); // successful updating
+        userService.update(user);
+        verify(userDao, times(1)).update(user);
+    }
 
 }
