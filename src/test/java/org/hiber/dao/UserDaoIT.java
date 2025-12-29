@@ -162,4 +162,25 @@ public class UserDaoIT {
         assertTrue(emails.contains("u3@test.com"));
     }
 
+    @Test
+    void testUpdateUser_Success() {
+        User user = new User("Original", "original@test.com", 20);
+        userDao.save(user);
+
+        user.setName("Updated");
+        user.setAge(25);
+        userDao.update(user);
+
+        User fromDb = userDao.findByEmail("original@test.com");
+        assertNotNull(fromDb);
+        assertEquals("Updated", fromDb.getName());
+        assertEquals(25, fromDb.getAge());
+    }
+
+    @Test
+    void testUpdateUser_NullUser() {
+        assertThrows(IllegalArgumentException.class, () -> userDao.update(null));
+    }
+
+
 }
