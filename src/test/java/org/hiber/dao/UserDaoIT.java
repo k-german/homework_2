@@ -182,5 +182,20 @@ public class UserDaoIT {
         assertThrows(IllegalArgumentException.class, () -> userDao.update(null));
     }
 
+    @Test
+    void testDeleteById_ExistingUser() {
+        User user = new User("ToDelete", "todelete@test.com", 30);
+        userDao.save(user);
 
+        int result = userDao.deleteById(user.getId());
+        assertEquals(1, result);
+        User fromDb = userDao.findById(user.getId()); //check db
+        assertNull(fromDb);
+    }
+
+    @Test
+    void testDeleteById_NonExistingUser() {
+        int result = userDao.deleteById(9999); // non-existent ID
+        assertEquals(0, result);
+    }
 }
