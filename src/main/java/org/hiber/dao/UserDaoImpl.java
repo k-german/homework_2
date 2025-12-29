@@ -15,8 +15,10 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void save(User user) {
+        Session session = null;
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(user);
             transaction.commit();
@@ -25,13 +27,19 @@ public class UserDaoImpl implements UserDao {
             if (transaction != null) transaction.rollback();
             logger.error("\"save(User user)\" failed: {}", user, e);
             throw e;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
     @Override
     public void update(User user) {
+        Session session = null;
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.merge(user);
             transaction.commit();
@@ -40,25 +48,39 @@ public class UserDaoImpl implements UserDao {
             if (transaction != null) transaction.rollback();
             logger.error("\"update(User user)\" failed: {}", user, e);
             throw e;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
     @Override
     public int deleteById(Integer id) {
+        Session session = null;
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
-            int result = session.createQuery("DELETE FROM User u WHERE u.id = :id", Integer.class)
+            int result = session.createQuery("DELETE FROM User u WHERE u.id = :id")
                     .setParameter("id", id)
                     .executeUpdate();
+
             transaction.commit();
             logger.info("\"deleteById(Integer id)\" - successfully. Id = {}, deleting result: {}",
                     id, result);
             return result;
+
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
             logger.error("\"deleteById(Integer id)\" failed: {}", id, e);
             throw e;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
