@@ -165,4 +165,32 @@ class UserServiceImplTest {
         verify(userDao, times(1)).update(user);
     }
 
+    @Test
+    void deleteById_invalidId_throwsBusinessException() {
+        assertThrows(BusinessException.class, () -> userService.deleteById(null));
+        assertThrows(BusinessException.class, () -> userService.deleteById(0));
+        verify(userDao, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteById_userNotFound_throwsUserNotFoundException() {
+        when(userDao.deleteById(1)).thenReturn(0);
+        assertThrows(UserNotFoundException.class, () -> userService.deleteById(1));
+        verify(userDao, times(1)).deleteById(1);
+    }
+
+    @Test
+    void deleteById_daoThrowsException_propagatesBusinessException() {
+        doThrow(new RuntimeException("DB error")).when(userDao).deleteById(1);
+        assertThrows(BusinessException.class, () -> userService.deleteById(1));
+        verify(userDao, times(1)).deleteById(1);
+    }
+
+    @Test
+    void deleteById_validId_callsDaoDeleteOnce() {
+        when(userDao.deleteById(1)).thenReturn(1);
+        userService.deleteById(1);
+        verify(userDao, times(1)).deleteById(1);
+    }
+
 }
