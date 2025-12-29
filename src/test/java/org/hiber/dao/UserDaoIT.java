@@ -39,7 +39,9 @@ public class UserDaoIT {
 
         try (var session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.createMutationQuery("DELETE FROM User").executeUpdate();
+            System.out.printf("Очистка таблицы User, удалено %d элементов\n': ",
+                    session.createMutationQuery("DELETE FROM User").executeUpdate());
+//            session.createMutationQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
         }
     }
@@ -51,7 +53,8 @@ public class UserDaoIT {
         }
     }
 
-    @Test // success
+    @Test
+        // success
     void testSaveUser() {
         User user = new User("TestUser", "testEmail@test.com", 25);
         userDao.save(user);
@@ -84,6 +87,42 @@ public class UserDaoIT {
     void testSaveUser_NullName() {
         assertThrows(NullPointerException.class,
                 () -> new User(null, "nullname@test.com", 20));
+    }
+
+    @Test
+    void testFindById_Success() {
+        User user = new User("TestUser", "testEmail@example.com", 30);
+        userDao.save(user);
+
+        User fromDb = userDao.findById(user.getId());
+        assertNotNull(fromDb);
+        assertEquals("TestUser", fromDb.getName());
+        assertEquals("testEmail@example.com", fromDb.getEmail());
+        assertEquals(30, fromDb.getAge());
+    }
+
+    // FAIL invalid id
+    @Test
+    void testFindById_NotFound() {
+        User fromDb = userDao.findById(-1);
+        assertNull(fromDb);
+    }
+
+    @Test
+    void testFindByEmail_Success() {
+        User user = new User("Bob", "bob@example.com", 25);
+        userDao.save(user);
+        User fromDb = userDao.findByEmail("bob@example.com");
+        assertNotNull(fromDb);
+        assertEquals("Bob", fromDb.getName());
+        assertEquals(25, fromDb.getAge());
+    }
+
+    // not found returns null
+    @Test
+    void testFindByEmail_NotFound() {
+        User fromDb = userDao.findByEmail("nonexistent@example.com");
+        assertNull(fromDb);
     }
 
 }
