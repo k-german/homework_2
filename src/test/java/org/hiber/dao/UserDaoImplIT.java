@@ -46,20 +46,20 @@ class UserDaoImplIT {
 
     @Test
     void testSaveAndFindById() {
-        User user = new User("Ivan", "ivan@example.com", 30);
+        User user = new User("1User", "1User@example.com", 30);
         userDao.save(user);
 
         User fromDb = userDao.findById(user.getId());
         assertNotNull(fromDb, "User должен существовать в БД");
-        assertEquals("ivan@example.com", fromDb.getEmail(), "Email должен совпадать");
-        assertEquals("Ivan", fromDb.getName(), "Имя должно совпадать");
+        assertEquals("1User@example.com", fromDb.getEmail(), "Email должен совпадать");
+        assertEquals("1User", fromDb.getName(), "Имя должно совпадать");
         assertEquals(30, fromDb.getAge(), "Возраст должен совпадать");
     }
 
     @Test
     void testFindAll() {
-        User user1 = new User("Anna", "anna@example.com", 22);
-        User user2 = new User("Petr", "petr@example.com", 25);
+        User user1 = new User("Auser", "auser@example.com", 22);
+        User user2 = new User("Buser", "buser@example.com", 25);
 
         userDao.save(user1);
         userDao.save(user2);
@@ -71,7 +71,7 @@ class UserDaoImplIT {
 
     @Test
     void testDeleteById() {
-        User user = new User("Olga", "olga@example.com", 28);
+        User user = new User("Cuser", "cuser@example.com", 28);
         userDao.save(user);
 
         int deleted = userDao.deleteById(user.getId());
