@@ -25,4 +25,17 @@ class UserServiceImplTest {
         assertThrows(BusinessException.class, () -> userService.deleteById(null));
         verifyNoInteractions(userDao);
     }
+
+    @Test
+    void deleteById_zeroId_throwsBusinessException() {
+        assertThrows(BusinessException.class, () -> userService.deleteById(0));
+        verifyNoInteractions(userDao);
+    }
+
+    @Test
+    void deleteById_negativeId_throwsBusinessException() {
+        assertThrows(BusinessException.class, () -> userService.deleteById(-5));
+        verifyNoInteractions(userDao);
+    }
+
 }
