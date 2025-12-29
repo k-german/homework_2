@@ -4,6 +4,7 @@ import org.hiber.dao.UserDao;
 import org.hiber.entity.User;
 import org.hiber.services.exceptions.BusinessException;
 import org.hiber.services.exceptions.EmailAlreadyExistsException;
+import org.hiber.services.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,11 +76,18 @@ public class UserServiceImpl implements UserService {
         validateId(id);
 
         try {
-            userDao.deleteById(id);
+            int result = userDao.deleteById(id);
+            if (result == 0) {
+                logger.warn("deleteById(Integer id) - user not found, id: {}", id);
+                throw new UserNotFoundException(id);
+            }
             logger.info("deleteById(Integer id) - success, id: {}", id);
-        } catch (Exception e) {
+        } catch (BusinessException e) {
             logger.error("deleteById(Integer id) - failed, id: {}", id, e);
             throw e;
+        } catch (Exception e) {
+            logger.error("deleteById(Integer id) - failed. Id:{}, Exception:{}", id, e.getMessage());
+            throw new BusinessException("Failed to delete user", e);
         }
         logger.debug("deleteById(Integer id) - exiting");
     }

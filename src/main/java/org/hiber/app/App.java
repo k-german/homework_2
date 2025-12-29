@@ -2,9 +2,11 @@ package org.hiber.app;
 
 import org.hiber.dao.UserDaoImpl;
 import org.hiber.entity.User;
+import org.hiber.services.exceptions.BusinessException;
 import org.hiber.services.exceptions.EmailAlreadyExistsException;
 import org.hiber.services.UserService;
 import org.hiber.services.UserServiceImpl;
+import org.hiber.services.exceptions.UserNotFoundException;
 import org.hiber.utils.HibernateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,43 +78,41 @@ public class App {
         System.out.println("Обновление данных пользователя.");
         int id = readIntInput("Введите ID пользователя для обновления: ");
         logger.info("User entered id: {}", id);
-        User user = userService.findById(id);
-        if (user == null) {
-            logger.info("User not found by id={}", id);
-            System.out.println("Пользователь не найден.");
-            return;
-        }
 
-        String name = readStringInput("Новое имя (" + user.getName() + "): ");
-        String email = readStringInput("Новый email (" + user.getEmail() + "): ");
-        int age = readIntInput("Новый возраст (" + user.getAge() + "): ");
+        String name = readStringInput("Новое имя: ");
+        String email = readStringInput("Новый email: ");
+        int age = readIntInput("Новый возраст: ");
 
-        if (!name.isEmpty()) {
-            user.setName(name);
+        try {
+            User user = new User(name, email, age);
+            user.setId(id);
+            logger.info("Updating user");
+            userService.update(user);
+            System.out.println("Данные пользователя перезаписаны.");
+            logger.info("User info updated");
+        } catch (BusinessException e) {
+            System.out.println(e.getMessage());
+            logger.warn("Updating user in DB Fails\n", e);
         }
-        if (!email.isEmpty()) {
-            user.setEmail(email);
-        }
-        user.setAge(age);
-        logger.info("Updating user");
-        userService.update(user);
-        System.out.println("Данные пользователя перезаписаны.");
-        logger.info("User info updated");
     }
 
     private void deleteUser() {
         logger.info("deleteUser start");
         int id = readIntInput("Введите ID для удаления пользователя: ");
         logger.info("Entered id: {}", id);
-        User user = userService.findById(id);
-        if (user == null) {
-            logger.info("User not found by id={}", id);
-            System.out.println("Пользователь не найден.");
-            return;
+
+        try {
+            userService.deleteById(id);
+            System.out.println("Пользователь удалён из БД.");
+            logger.info("User id {} deleted", id);
+        } catch (UserNotFoundException e) {
+            System.out.printf("Пользователь с id %d не найден.", id);
+            logger.warn("deleteUser - failed, id: {}\n{}\n{}", id, e.getClass(), e.getMessage());
+        } catch (BusinessException e) {
+            System.out.println(e.getMessage());
+            logger.error("deleteUser - failed, id: {}", id, e);
         }
-        userService.deleteById(id);
-        System.out.println("Пользователь удалён из БД.");
-        logger.info("User id {} deleted", id);
+
     }
 
     private void listAllUsers() {

@@ -44,16 +44,17 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public int deleteById(Integer id) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            int count = session.createQuery("DELETE FROM User u WHERE u.id = :id", Integer.class)
+            int result = session.createQuery("DELETE FROM User u WHERE u.id = :id", Integer.class)
                     .setParameter("id", id)
                     .executeUpdate();
             transaction.commit();
-            logger.info("\"deleteById(Integer id)\" - successfully. Id = {}, deleted elements: {}",
-                    id, count);
+            logger.info("\"deleteById(Integer id)\" - successfully. Id = {}, deleting result: {}",
+                    id, result);
+            return result;
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
             logger.error("\"deleteById(Integer id)\" failed: {}", id, e);
