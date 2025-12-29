@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -93,6 +93,33 @@ class UserServiceImplTest {
         when(userDao.findByEmail("validemail@example.com")).thenReturn(null);
         userService.create(newUser);
         verify(userDao, times(1)).save(newUser);
+    }
+
+    @Test
+    void findById_invalidId_throwsBusinessException() {
+        assertThrows(BusinessException.class, () -> userService.findById(null));
+        assertThrows(BusinessException.class, () -> userService.findById(0));
+        verify(userDao, never()).findById(any());
+    }
+
+    @Test
+    void findById_existingUser_returnsUser() {
+        User existingUser = new User("ExistingUserName", "ExUserEmail@example.com", 30);
+        when(userDao.findById(1)).thenReturn(existingUser);
+        User result = userService.findById(1);
+
+        assertNotNull(result);
+        assertEquals("ExistingUserName", result.getName());
+        assertEquals("ExUserEmail@example.com", result.getEmail());
+        verify(userDao, times(1)).findById(1);
+    }
+
+    @Test
+    void findById_nonExistingUser_returnsNull() {
+        when(userDao.findById(2)).thenReturn(null);
+        User result = userService.findById(2);
+        assertNull(result);
+        verify(userDao, times(1)).findById(2);
     }
 
 
