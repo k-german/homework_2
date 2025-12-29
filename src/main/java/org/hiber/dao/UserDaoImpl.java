@@ -1,6 +1,7 @@
 package org.hiber.dao;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hiber.utils.HibernateUtil;
 import org.hiber.entity.User;
@@ -11,14 +12,28 @@ import java.util.List;
 
 public class UserDaoImpl implements UserDao {
 
+    private final SessionFactory sessionFactory;
+
     private static final Logger logger = LoggerFactory.getLogger(UserDaoImpl.class);
+
+    public UserDaoImpl() {
+        this.sessionFactory = HibernateUtil.getSessionFactory();
+    }
+
+    public UserDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    private SessionFactory getSessionFactory() {
+        return this.sessionFactory;
+    }
 
     @Override
     public void save(User user) {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(user);
             transaction.commit();
@@ -39,7 +54,7 @@ public class UserDaoImpl implements UserDao {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.merge(user);
             transaction.commit();
@@ -60,7 +75,7 @@ public class UserDaoImpl implements UserDao {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = getSessionFactory().openSession();
             transaction = session.beginTransaction();
             int result = session.createQuery("DELETE FROM User u WHERE u.id = :id")
                     .setParameter("id", id)
@@ -86,14 +101,14 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User findById(Integer id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = getSessionFactory().openSession()) {
             return session.find(User.class, id);
         }
     }
 
     @Override
     public User findByEmail(String email) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = getSessionFactory().openSession()) {
             return session.createQuery("from User u where u.email = :email", User.class)
                     .setParameter("email", email)
                     .uniqueResult();
@@ -102,7 +117,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = getSessionFactory().openSession()) {
             return session.createQuery("from User", User.class).list();
         }
     }
