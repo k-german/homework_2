@@ -1,41 +1,40 @@
-package org.hiber.kisel.entity;
+package org.hiber.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
+@Setter
 @Getter
 @Entity
 @Table(name = "users")
 public class User {
 
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Setter
+    @NonNull
     @Column(nullable = false)
     private String name;
 
-    @Setter
+    @NonNull
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Setter
     private Integer age;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public User() {
-    }
-
-    public User(String name, String email, Integer age) {
+    public User(@NonNull String name, @NonNull String email, Integer age) {
         this.name = name;
         this.email = email;
         this.age = age;

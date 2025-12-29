@@ -1,10 +1,13 @@
-package org.hiber.kisel.app;
+package org.hiber.app;
 
-import org.hiber.kisel.dao.UserDao;
-import org.hiber.kisel.dao.UserDaoImpl;
-import org.hiber.kisel.entity.User;
-import org.hiber.kisel.exceptions.EmailAlreadyExistsException;
-import org.hiber.kisel.utils.HibernateUtil;
+import org.hiber.dao.UserDaoImpl;
+import org.hiber.entity.User;
+import org.hiber.services.exceptions.BusinessException;
+import org.hiber.services.exceptions.EmailAlreadyExistsException;
+import org.hiber.services.UserService;
+import org.hiber.services.UserServiceImpl;
+import org.hiber.services.exceptions.UserNotFoundException;
+import org.hiber.utils.HibernateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +18,8 @@ public class App {
     private final Logger logger = LoggerFactory.getLogger(App.class);
 
     private static final Scanner scanner = new Scanner(System.in);
-    private static final UserDao userDao = new UserDaoImpl();
+    private static final UserService userService =
+            new UserServiceImpl(new UserDaoImpl());
 
     public static void main(String[] args) {
         App menu = new App();
@@ -29,7 +33,7 @@ public class App {
             logger.info("Show main menu");
             printMenu();
             int choice = readIntInput("Введите 0 - 4: ");
-            logger.info("User input {}", choice);
+            logger.info("User input menu choice: {}", choice);
 
             switch (choice) {
                 case 0 -> exit = true;
@@ -53,17 +57,19 @@ public class App {
         String email = readStringInput("Email: ");
         int age = readIntInput("Возраст: ");
 
+        logger.info("user creation started: name={}, email={}, age={}", name, email, age);
         User user = new User(name, email, age);
         logger.info("new user created\ntrying to save user to DB");
 
         try {
-            userDao.save(user);
+            userService.create(user);
             System.out.printf("Пользователь добавлен в БД с ID: %s", user.getId());
-            logger.info("Successful saving user to DB");
+            logger.info("Successful saving user to DB: id={}, email={}, age={}",
+                    user.getId(), user.getEmail(), user.getAge());
         } catch (EmailAlreadyExistsException e) {
             System.out.printf(e.getMessage());
             System.out.println("\nОшибка записи в БД.");
-            logger.info("Saving user to DB Fails");
+            logger.warn("Saving user to DB Fails: email={}\nException: {}", user.getEmail(), e.getMessage());
         }
     }
 
@@ -71,50 +77,48 @@ public class App {
         logger.info("updateUser start");
         System.out.println("Обновление данных пользователя.");
         int id = readIntInput("Введите ID пользователя для обновления: ");
-        logger.info("Entered id: {}", id);
-        User user = userDao.findById(id);
-        if (user == null) {
-            logger.info("User was not found");
-            System.out.println("Пользователь не найден.");
-            return;
-        }
+        logger.info("User entered id: {}", id);
 
-        String name = readStringInput("Новое имя (" + user.getName() + "): ");
-        String email = readStringInput("Новый email (" + user.getEmail() + "): ");
-        int age = readIntInput("Новый возраст (" + user.getAge() + "): ");
+        String name = readStringInput("Новое имя: ");
+        String email = readStringInput("Новый email: ");
+        int age = readIntInput("Новый возраст: ");
 
-        if (!name.isEmpty()) {
-            user.setName(name);
+        try {
+            User user = new User(name, email, age);
+            user.setId(id);
+            logger.info("Updating user");
+            userService.update(user);
+            System.out.println("Данные пользователя перезаписаны.");
+            logger.info("User info updated");
+        } catch (BusinessException e) {
+            System.out.println(e.getMessage());
+            logger.warn("Updating user in DB Fails\n", e);
         }
-        if (!email.isEmpty()) {
-            user.setEmail(email);
-        }
-        user.setAge(age);
-        logger.info("Updating user");
-        userDao.update(user);
-        System.out.println("Данные пользователя перезаписаны.");
-        logger.info("User info updated");
     }
 
     private void deleteUser() {
         logger.info("deleteUser start");
         int id = readIntInput("Введите ID для удаления пользователя: ");
         logger.info("Entered id: {}", id);
-        User user = userDao.findById(id);
-        if (user == null) {
-            logger.info("User was not found");
-            System.out.println("Пользователь не найден.");
-            return;
+
+        try {
+            userService.deleteById(id);
+            System.out.println("Пользователь удалён из БД.");
+            logger.info("User id {} deleted", id);
+        } catch (UserNotFoundException e) {
+            System.out.printf("Пользователь с id %d не найден.", id);
+            logger.warn("deleteUser - failed, id: {}\n{}\n{}", id, e.getClass(), e.getMessage());
+        } catch (BusinessException e) {
+            System.out.println(e.getMessage());
+            logger.error("deleteUser - failed, id: {}", id, e);
         }
-        userDao.delete(user);
-        System.out.println("Пользователь удалён из БД.");
-        logger.info("User id {} deleted", id);
+
     }
 
     private void listAllUsers() {
         logger.info("listAllUsers start");
         System.out.println("Список пользователей из БД:");
-        var users = userDao.findAll();
+        var users = userService.findAll();
         if (users.isEmpty()) {
             System.out.println("Не найдено записей в БД.");
             logger.info("DB empty");
@@ -152,7 +156,7 @@ public class App {
     }
 
     private void printInputError() {
-        logger.info("Input error");
+        logger.warn("Input error, expecting int");
         System.out.println("Ввод нераспознан, повторите.");
     }
 
