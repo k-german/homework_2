@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -192,5 +194,32 @@ class UserServiceImplTest {
         userService.deleteById(1);
         verify(userDao, times(1)).deleteById(1);
     }
+
+    @Test
+    void findAll_returnsListOfUsers() {
+        User user1 = new User("User1", "user1@example.com", 25);
+        User user2 = new User("User2", "user2@example.com", 30);
+
+        when(userDao.findAll()).thenReturn(List.of(user1, user2));
+
+        List<User> result = userService.findAll();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(user1));
+        assertTrue(result.contains(user2));
+
+        verify(userDao, times(1)).findAll();
+    }
+
+    @Test
+    void findAll_returnsEmptyList_whenDaoReturnsEmpty() {
+        when(userDao.findAll()).thenReturn(List.of());
+        List<User> result = userService.findAll();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(userDao, times(1)).findAll();
+    }
+
 
 }
