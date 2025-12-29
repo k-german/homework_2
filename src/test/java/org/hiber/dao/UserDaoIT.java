@@ -5,14 +5,17 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserDaoIT {
 
-    private static final PostgreSQLContainer<?> POSTGRES_CONTAINER =
+    @Container
+    private static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:18.1")
                     .withDatabaseName("test_db")
                     .withUsername("test")
@@ -21,41 +24,34 @@ public class UserDaoIT {
     private UserDao userDao;
     private SessionFactory sessionFactory;
 
-    @BeforeAll
+    @BeforeEach
     void setUpAll() {
-        POSTGRES_CONTAINER.start();
-
         Configuration configuration = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(User.class);
 
-        configuration.setProperty("hibernate.connection.url", POSTGRES_CONTAINER.getJdbcUrl());
-        configuration.setProperty("hibernate.connection.username", POSTGRES_CONTAINER.getUsername());
-        configuration.setProperty("hibernate.connection.password", POSTGRES_CONTAINER.getPassword());
+        configuration.setProperty("hibernate.connection.url", postgres.getJdbcUrl());
+        configuration.setProperty("hibernate.connection.username", postgres.getUsername());
+        configuration.setProperty("hibernate.connection.password", postgres.getPassword());
 
         sessionFactory = configuration.buildSessionFactory();
         userDao = new UserDaoImpl(sessionFactory);
-    }
 
-    @BeforeEach
-    void cleanDatabase() {
         try (var session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.createQuery("DELETE FROM User").executeUpdate();
+            session.createMutationQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
         }
     }
 
-    @AfterAll
+    @AfterEach
     void tearDownAll() {
         if (sessionFactory != null) {
             sessionFactory.close();
         }
-        POSTGRES_CONTAINER.stop();
     }
 
     @Test // success
-//    @Order(1)
     void testSaveUser() {
         User user = new User("TestUser", "testEmail@test.com", 25);
         userDao.save(user);
@@ -68,14 +64,12 @@ public class UserDaoIT {
 
     // FAIL - user == null
     @Test
-//    @Order(2)
     void testSaveUser_NullUser() {
         assertThrows(IllegalArgumentException.class, () -> userDao.save(null));
     }
 
     // FAIL - duplicate email
     @Test
-//    @Order(3)
     void testSaveUser_DuplicateEmail() {
         User first = new User("User1", "duplicate@example.com", 30);
         userDao.save(first);
@@ -87,14 +81,9 @@ public class UserDaoIT {
     // FAIL - name == null
     // lombok annotation @NonNull in entity User.java
     @Test
-//    @Order(4)
     void testSaveUser_NullName() {
-//        User user = new User(null, "nullname@test.com", 20);
         assertThrows(NullPointerException.class,
                 () -> new User(null, "nullname@test.com", 20));
-//        assertThrows(NullPointerException.class, () -> userDao.save(user),
-//                "Exception thrown - name == null (@NonNull annotation)");
     }
-
 
 }
