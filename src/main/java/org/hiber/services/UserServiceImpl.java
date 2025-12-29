@@ -59,13 +59,12 @@ public class UserServiceImpl implements UserService {
         validateUser(user);
         validateId(user.getId());
 
-        User userWithSameEmail = userDao.findByEmail(user.getEmail());
-        if (userWithSameEmail != null && !Objects.equals(userWithSameEmail.getId(), user.getId())) {
-            logger.warn("update(User user) - Email already exists: {}", user.getEmail());
+        try {
+            userDao.update(user);
+        } catch (Exception e) {
+            logger.warn("update(User user) - fails: \n{}", e.getMessage());
             throw new EmailAlreadyExistsException(user.getEmail());
         }
-
-        userDao.update(user);
         logger.info("update(User user) - successful exiting: {}", user);
         logger.debug("update(User user) - successful exiting: {}", user);
     }
