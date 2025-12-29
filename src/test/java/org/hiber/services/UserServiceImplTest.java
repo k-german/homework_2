@@ -1,7 +1,9 @@
 package org.hiber.services;
 
 import org.hiber.dao.UserDao;
+import org.hiber.entity.User;
 import org.hiber.services.exceptions.BusinessException;
+import org.hiber.services.exceptions.EmailAlreadyExistsException;
 import org.hiber.services.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,5 +56,36 @@ class UserServiceImplTest {
         userService.deleteById(validId);
         verify(userDao, times(1)).deleteById(validId);
     }
+
+    @Test
+    void create_nullUser_throwsBusinessException() {
+        User nullUser = null;
+        assertThrows(BusinessException.class, () -> userService.create(nullUser));
+        verify(userDao, never()).save(any());
+    }
+
+    @Test
+    void create_userWithEmptyName_throwsBusinessException() {
+        User user = new User("", "valid@email.com", 25);
+        assertThrows(BusinessException.class, () -> userService.create(user));
+        verify(userDao, never()).save(any());
+    }
+
+    @Test
+    void create_userWithEmptyEmail_throwsBusinessException() {
+        User user = new User("Valid Name", "", 25);
+        assertThrows(BusinessException.class, () -> userService.create(user));
+        verify(userDao, never()).save(any());
+    }
+
+    @Test
+    void create_userWithExistingEmail_throwsEmailAlreadyExistsException() {
+        User existingUser = new User("ExampleUser", "test@example.com", 30);
+        when(userDao.findByEmail("test@example.com")).thenReturn(existingUser);
+        User newUser = new User("New User", "test@example.com", 25);
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.create(newUser));
+        verify(userDao, never()).save(any());
+    }
+
 
 }
