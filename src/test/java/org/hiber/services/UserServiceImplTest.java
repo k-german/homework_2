@@ -87,5 +87,13 @@ class UserServiceImplTest {
         verify(userDao, never()).save(any());
     }
 
+    @Test
+    void create_validUser_callsDaoSaveOnce() {
+        User newUser = new User("ValidUser", "validemail@example.com", 25);
+        when(userDao.findByEmail("validemail@example.com")).thenReturn(null);
+        userService.create(newUser);
+        verify(userDao, times(1)).save(newUser);
+    }
+
 
 }
