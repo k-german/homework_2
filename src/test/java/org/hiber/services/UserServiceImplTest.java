@@ -47,4 +47,12 @@ class UserServiceImplTest {
         verify(userDao, times(1)).deleteById(validId);
     }
 
+    @Test
+    void deleteById_validId_successfulDeletion() {
+        Integer validId = 22;
+        when(userDao.deleteById(validId)).thenReturn(1);
+        userService.deleteById(validId);
+        verify(userDao, times(1)).deleteById(validId);
+    }
+
 }
