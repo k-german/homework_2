@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
 
 public class UserServiceImpl implements UserService {
 
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService {
             userDao.update(user);
         } catch (Exception e) {
             logger.warn("update(User user) - fails: \n{}", e.getMessage());
-            throw new EmailAlreadyExistsException(user.getEmail());
+            throw e;
         }
         logger.info("update(User user) - successful exiting: {}", user);
         logger.debug("update(User user) - successful exiting: {}", user);
