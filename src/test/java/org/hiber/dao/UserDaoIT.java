@@ -29,7 +29,7 @@ public class UserDaoIT {
     @BeforeEach
     void setUpAll() {
         Configuration configuration = new Configuration()
-                .configure("hibernate.cfg.xml")
+                .configure("test-hibernate.cfg.xml")
                 .addAnnotatedClass(User.class);
 
         configuration.setProperty("hibernate.connection.url", postgres.getJdbcUrl());
@@ -41,7 +41,7 @@ public class UserDaoIT {
 
         try (var session = sessionFactory.openSession()) {
             session.beginTransaction();
-            System.out.printf("Очистка таблицы User, удалено %d элементов\n': ",
+            System.out.printf("Очистка таблицы User, удалено '%d' элементов\n",
                     session.createMutationQuery("DELETE FROM User").executeUpdate());
 //            session.createMutationQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
