@@ -26,7 +26,7 @@ public class UserDaoIT {
     private UserDao userDao;
     private SessionFactory sessionFactory;
 
-    @BeforeEach
+    @BeforeAll
     void setUpAll() {
         Configuration configuration = new Configuration()
                 .configure("test-hibernate.cfg.xml")
@@ -38,17 +38,18 @@ public class UserDaoIT {
 
         sessionFactory = configuration.buildSessionFactory();
         userDao = new UserDaoImpl(sessionFactory);
+    }
 
+    @BeforeEach
+    void cleanDb() {
         try (var session = sessionFactory.openSession()) {
             session.beginTransaction();
-            System.out.printf("Очистка таблицы User, удалено '%d' элементов\n",
-                    session.createMutationQuery("DELETE FROM User").executeUpdate());
-//            session.createMutationQuery("DELETE FROM User").executeUpdate();
+            session.createMutationQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
         }
     }
 
-    @AfterEach
+    @AfterAll
     void tearDownAll() {
         if (sessionFactory != null) {
             sessionFactory.close();
