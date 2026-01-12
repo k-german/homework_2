@@ -4,6 +4,8 @@ import org.hiber.entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserDaoIT {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserDaoIT.class);
+
     @Container
     private static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:18.1")
@@ -26,10 +30,11 @@ public class UserDaoIT {
     private UserDao userDao;
     private SessionFactory sessionFactory;
 
-    @BeforeEach
+    @BeforeAll
     void setUpAll() {
+        logger.info("setUpAll started.");
         Configuration configuration = new Configuration()
-                .configure("hibernate.cfg.xml")
+                .configure("test-hibernate.cfg.xml")
                 .addAnnotatedClass(User.class);
 
         configuration.setProperty("hibernate.connection.url", postgres.getJdbcUrl());
@@ -38,18 +43,22 @@ public class UserDaoIT {
 
         sessionFactory = configuration.buildSessionFactory();
         userDao = new UserDaoImpl(sessionFactory);
+    }
 
+    @BeforeEach
+    void cleanDb() {
         try (var session = sessionFactory.openSession()) {
             session.beginTransaction();
-            System.out.printf("Очистка таблицы User, удалено %d элементов\n': ",
-                    session.createMutationQuery("DELETE FROM User").executeUpdate());
 //            session.createMutationQuery("DELETE FROM User").executeUpdate();
+            int deleteCount = session.createMutationQuery("DELETE FROM User").executeUpdate();
+            logger.info("Clean table User, deleted {} elements", deleteCount);
             session.getTransaction().commit();
         }
     }
 
-    @AfterEach
+    @AfterAll
     void tearDownAll() {
+        logger.info("test: UserDaoIT.java tearDownAll start.");
         if (sessionFactory != null) {
             sessionFactory.close();
         }
@@ -58,6 +67,7 @@ public class UserDaoIT {
     @Test
         // success
     void testSaveUser() {
+        logger.info("test: UserDaoIT.java testSaveUser start.");
         User user = new User("TestUser", "testEmail@test.com", 25);
         userDao.save(user);
 
