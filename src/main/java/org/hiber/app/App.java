@@ -76,7 +76,7 @@ public class App {
     private void updateUser() {
         logger.info("updateUser start");
         System.out.println("Обновление данных пользователя.");
-        int id = readIntInput("Введите ID пользователя для обновления: ");
+        long id = readIntInput("Введите ID пользователя для обновления: ");
         logger.info("User entered id: {}", id);
 
         String name = readStringInput("Новое имя: ");
@@ -98,7 +98,7 @@ public class App {
 
     private void deleteUser() {
         logger.info("deleteUser start");
-        int id = readIntInput("Введите ID для удаления пользователя: ");
+        long id = readIntInput("Введите ID для удаления пользователя: ");
         logger.info("Entered id: {}", id);
 
         try {

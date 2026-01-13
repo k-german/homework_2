@@ -71,7 +71,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public int deleteById(Integer id) {
+    public int deleteById(Long id) {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -100,7 +100,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User findById(Integer id) {
+    public User findById(Long id) {
         try (Session session = getSessionFactory().openSession()) {
             return session.find(User.class, id);
         }

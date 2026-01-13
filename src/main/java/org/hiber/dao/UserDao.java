@@ -9,9 +9,9 @@ public interface UserDao {
 
     void update(User user);
 
-    int deleteById(Integer id);
+    int deleteById(Long id);
 
-    User findById(Integer id);
+    User findById(Long id);
 
     User findByEmail(String email);
 

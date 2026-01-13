@@ -36,11 +36,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(Integer id) {
-        logger.debug("public User findById(Integer id) - started, id: {}", id);
+    public User findById(Long id) {
+        logger.debug("public User findById(Long id) - started, id: {}", id);
         validateId(id);
         User result = userDao.findById(id);
-        logger.debug("public User findById(Integer id) - exiting, user: {}", result);
+        logger.debug("public User findById(Long id) - exiting, user: {}", result);
         return result;
     }
 
@@ -69,25 +69,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteById(Integer id) {
-        logger.debug("deleteById(Integer id) - started, id: {}", id);
+    public void deleteById(Long id) {
+        logger.debug("deleteById(Long id) - started, id: {}", id);
         validateId(id);
 
         try {
             int result = userDao.deleteById(id);
             if (result == 0) {
-                logger.warn("deleteById(Integer id) - user not found, id: {}", id);
+                logger.warn("deleteById(Long id) - user not found, id: {}", id);
                 throw new UserNotFoundException(id);
             }
-            logger.info("deleteById(Integer id) - success, id: {}", id);
+            logger.info("deleteById(Long id) - success, id: {}", id);
         } catch (BusinessException e) {
-            logger.error("deleteById(Integer id) - failed, id: {}", id, e);
+            logger.error("deleteById(Long id) - failed, id: {}", id, e);
             throw e;
         } catch (Exception e) {
-            logger.error("deleteById(Integer id) - failed. Id:{}, Exception:{}", id, e.getMessage());
+            logger.error("deleteById(Long id) - failed. Id:{}, Exception:{}", id, e.getMessage());
             throw new BusinessException("Failed to delete user", e);
         }
-        logger.debug("deleteById(Integer id) - exiting");
+        logger.debug("deleteById(Long id) - exiting");
     }
 
     private void validateUser(User user) {
@@ -105,9 +105,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateId(Integer id) {
+    private void validateId(Long id) {
         if (id == null || id <= 0) {
-            logger.error("validateId(Integer id) - invalid id: {}", id);
+            logger.error("validateId(Long id) - invalid id: {}", id);
             throw new BusinessException("Invalid id");
         }
     }

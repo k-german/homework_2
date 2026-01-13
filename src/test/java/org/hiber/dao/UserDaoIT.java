@@ -116,7 +116,7 @@ public class UserDaoIT {
     // FAIL invalid id
     @Test
     void testFindById_NotFound() {
-        User fromDb = userDao.findById(-1);
+        User fromDb = userDao.findById(-1L);
         assertNull(fromDb);
     }
 
@@ -205,7 +205,7 @@ public class UserDaoIT {
 
     @Test
     void testDeleteById_NonExistingUser() {
-        int result = userDao.deleteById(9999); // non-existent ID
+        int result = userDao.deleteById(9999L); // non-existent ID
         assertEquals(0, result);
     }
 }

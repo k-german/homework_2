@@ -33,19 +33,19 @@ class UserServiceImplTest {
 
     @Test
     void deleteById_zeroId_throwsBusinessException() {
-        assertThrows(BusinessException.class, () -> userService.deleteById(0));
+        assertThrows(BusinessException.class, () -> userService.deleteById(0L));
         verifyNoInteractions(userDao);
     }
 
     @Test
     void deleteById_negativeId_throwsBusinessException() {
-        assertThrows(BusinessException.class, () -> userService.deleteById(-5));
+        assertThrows(BusinessException.class, () -> userService.deleteById((long) -5));
         verifyNoInteractions(userDao);
     }
 
     @Test
     void deleteById_validId_userNotFound_throwsUserNotFoundException() {
-        Integer validId = 50;
+        long validId = 50;
         when(userDao.deleteById(validId)).thenReturn(0);
         assertThrows(UserNotFoundException.class, () -> userService.deleteById(validId));
         verify(userDao, times(1)).deleteById(validId);
@@ -53,7 +53,7 @@ class UserServiceImplTest {
 
     @Test
     void deleteById_validId_successfulDeletion() {
-        Integer validId = 22;
+        long validId = 22;
         when(userDao.deleteById(validId)).thenReturn(1);
         userService.deleteById(validId);
         verify(userDao, times(1)).deleteById(validId);
@@ -100,28 +100,28 @@ class UserServiceImplTest {
     @Test
     void findById_invalidId_throwsBusinessException() {
         assertThrows(BusinessException.class, () -> userService.findById(null));
-        assertThrows(BusinessException.class, () -> userService.findById(0));
+        assertThrows(BusinessException.class, () -> userService.findById(0L));
         verify(userDao, never()).findById(any());
     }
 
     @Test
     void findById_existingUser_returnsUser() {
         User existingUser = new User("ExistingUserName", "ExUserEmail@example.com", 30);
-        when(userDao.findById(1)).thenReturn(existingUser);
-        User result = userService.findById(1);
+        when(userDao.findById(1L)).thenReturn(existingUser);
+        User result = userService.findById(1L);
 
         assertNotNull(result);
         assertEquals("ExistingUserName", result.getName());
         assertEquals("ExUserEmail@example.com", result.getEmail());
-        verify(userDao, times(1)).findById(1);
+        verify(userDao, times(1)).findById(1L);
     }
 
     @Test
     void findById_nonExistingUser_returnsNull() {
-        when(userDao.findById(2)).thenReturn(null);
-        User result = userService.findById(2);
+        when(userDao.findById(2L)).thenReturn(null);
+        User result = userService.findById(2L);
         assertNull(result);
-        verify(userDao, times(1)).findById(2);
+        verify(userDao, times(1)).findById(2L);
     }
 
     @Test
@@ -133,9 +133,9 @@ class UserServiceImplTest {
     @Test
     void update_userWithEmptyNameOrEmail_throwsBusinessException() {
         User userEmptyName = new User("", "testemail@example.com", 25);
-        userEmptyName.setId(1);
+        userEmptyName.setId(1L);
         User userEmptyEmail = new User("Username", "", 25);
-        userEmptyEmail.setId(1);
+        userEmptyEmail.setId(1L);
         assertThrows(BusinessException.class, () -> userService.update(userEmptyName));
         assertThrows(BusinessException.class, () -> userService.update(userEmptyEmail));
         verify(userDao, never()).update(any());
@@ -144,7 +144,7 @@ class UserServiceImplTest {
     @Test
     void update_userWithInvalidId_throwsBusinessException() { // validateId tested
         User user = new User("Username", "testemail@example.com", 25);
-        user.setId(0);
+        user.setId(0L);
         assertThrows(BusinessException.class, () -> userService.update(user));
         verify(userDao, never()).update(any());
     }
@@ -152,7 +152,7 @@ class UserServiceImplTest {
     @Test
     void update_daoThrowsException_propagatesException() {
         User user = new User("Username", "testemail@example.com", 25);
-        user.setId(1);
+        user.setId(1L);
         doThrow(new RuntimeException("DB error")).when(userDao).update(user);
         assertThrows(RuntimeException.class, () -> userService.update(user));
         verify(userDao, times(1)).update(user);
@@ -161,7 +161,7 @@ class UserServiceImplTest {
     @Test
     void update_validUser_callsDaoUpdateOnce() {
         User user = new User("Username", "testemail@example.com", 25);
-        user.setId(1);
+        user.setId(1L);
         doNothing().when(userDao).update(user); // successful updating
         userService.update(user);
         verify(userDao, times(1)).update(user);
@@ -170,29 +170,29 @@ class UserServiceImplTest {
     @Test
     void deleteById_invalidId_throwsBusinessException() {
         assertThrows(BusinessException.class, () -> userService.deleteById(null));
-        assertThrows(BusinessException.class, () -> userService.deleteById(0));
+        assertThrows(BusinessException.class, () -> userService.deleteById(0L));
         verify(userDao, never()).deleteById(any());
     }
 
     @Test
     void deleteById_userNotFound_throwsUserNotFoundException() {
-        when(userDao.deleteById(1)).thenReturn(0);
-        assertThrows(UserNotFoundException.class, () -> userService.deleteById(1));
-        verify(userDao, times(1)).deleteById(1);
+        when(userDao.deleteById(1L)).thenReturn(0);
+        assertThrows(UserNotFoundException.class, () -> userService.deleteById(1L));
+        verify(userDao, times(1)).deleteById(1L);
     }
 
     @Test
     void deleteById_daoThrowsException_propagatesBusinessException() {
-        doThrow(new RuntimeException("DB error")).when(userDao).deleteById(1);
-        assertThrows(BusinessException.class, () -> userService.deleteById(1));
-        verify(userDao, times(1)).deleteById(1);
+        doThrow(new RuntimeException("DB error")).when(userDao).deleteById(1L);
+        assertThrows(BusinessException.class, () -> userService.deleteById(1L));
+        verify(userDao, times(1)).deleteById(1L);
     }
 
     @Test
     void deleteById_validId_callsDaoDeleteOnce() {
-        when(userDao.deleteById(1)).thenReturn(1);
-        userService.deleteById(1);
-        verify(userDao, times(1)).deleteById(1);
+        when(userDao.deleteById(1L)).thenReturn(1);
+        userService.deleteById(1L);
+        verify(userDao, times(1)).deleteById(1L);
     }
 
     @Test
