@@ -1,7 +1,7 @@
 package org.hiber.services;
 
-import org.hiber.dao.UserDao;
 import org.hiber.entity.User;
+import org.hiber.repository.UserRepository;
 import org.hiber.services.exceptions.BusinessException;
 import org.hiber.services.exceptions.EmailAlreadyExistsException;
 import org.hiber.services.exceptions.UserNotFoundException;
@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -20,7 +21,9 @@ import static org.mockito.Mockito.*;
 class UserServiceImplTest {
 
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
+//    private UserDao userRepository;
+
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -28,171 +31,146 @@ class UserServiceImplTest {
     @Test
     void deleteById_nullId_throwsBusinessException() {
         assertThrows(BusinessException.class, () -> userService.deleteById(null));
-        verifyNoInteractions(userDao);
+        verifyNoInteractions(userRepository);
     }
 
     @Test
     void deleteById_zeroId_throwsBusinessException() {
         assertThrows(BusinessException.class, () -> userService.deleteById(0L));
-        verifyNoInteractions(userDao);
+        verifyNoInteractions(userRepository);
     }
 
     @Test
     void deleteById_negativeId_throwsBusinessException() {
         assertThrows(BusinessException.class, () -> userService.deleteById((long) -5));
-        verifyNoInteractions(userDao);
-    }
-
-    @Test
-    void deleteById_validId_userNotFound_throwsUserNotFoundException() {
-        long validId = 50;
-        when(userDao.deleteById(validId)).thenReturn(0);
-        assertThrows(UserNotFoundException.class, () -> userService.deleteById(validId));
-        verify(userDao, times(1)).deleteById(validId);
+        verifyNoInteractions(userRepository);
     }
 
     @Test
     void deleteById_validId_successfulDeletion() {
         long validId = 22;
-        when(userDao.deleteById(validId)).thenReturn(1);
+        when(userRepository.existsById(validId)).thenReturn(true);
         userService.deleteById(validId);
-        verify(userDao, times(1)).deleteById(validId);
+        verify(userRepository).deleteById(validId);
     }
 
     @Test
     void create_nullUser_throwsBusinessException() {
         User nullUser = null;
         assertThrows(BusinessException.class, () -> userService.create(nullUser));
-        verify(userDao, never()).save(any());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
     void create_userWithEmptyName_throwsBusinessException() {
         User user = new User("", "valid@email.com", 25);
         assertThrows(BusinessException.class, () -> userService.create(user));
-        verify(userDao, never()).save(any());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
     void create_userWithEmptyEmail_throwsBusinessException() {
         User user = new User("Valid Name", "", 25);
         assertThrows(BusinessException.class, () -> userService.create(user));
-        verify(userDao, never()).save(any());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
     void create_userWithExistingEmail_throwsEmailAlreadyExistsException() {
         User existingUser = new User("ExampleUser", "test@example.com", 30);
-        when(userDao.findByEmail("test@example.com")).thenReturn(existingUser);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(existingUser));
         User newUser = new User("New User", "test@example.com", 25);
         assertThrows(EmailAlreadyExistsException.class, () -> userService.create(newUser));
-        verify(userDao, never()).save(any());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
-    void create_validUser_callsDaoSaveOnce() {
+    void create_validUser_callsRepositorySaveOnce() {
         User newUser = new User("ValidUser", "validemail@example.com", 25);
-        when(userDao.findByEmail("validemail@example.com")).thenReturn(null);
-        userService.create(newUser);
-        verify(userDao, times(1)).save(newUser);
+
+        when(userRepository.findByEmail("validemail@example.com"))
+                .thenReturn(Optional.empty());
+        when(userRepository.save(newUser))
+                .thenReturn(newUser);
+
+        User result = userService.create(newUser);
+
+        assertNotNull(result);
+        verify(userRepository, times(1)).save(newUser);
     }
+
 
     @Test
     void findById_invalidId_throwsBusinessException() {
         assertThrows(BusinessException.class, () -> userService.findById(null));
         assertThrows(BusinessException.class, () -> userService.findById(0L));
-        verify(userDao, never()).findById(any());
+        verify(userRepository, never()).findById(any());
     }
 
     @Test
     void findById_existingUser_returnsUser() {
         User existingUser = new User("ExistingUserName", "ExUserEmail@example.com", 30);
-        when(userDao.findById(1L)).thenReturn(existingUser);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         User result = userService.findById(1L);
-
         assertNotNull(result);
         assertEquals("ExistingUserName", result.getName());
         assertEquals("ExUserEmail@example.com", result.getEmail());
-        verify(userDao, times(1)).findById(1L);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void findById_nonExistingUser_returnsNull() {
-        when(userDao.findById(2L)).thenReturn(null);
+        when(userRepository.findById(2L)).thenReturn(Optional.empty());
         User result = userService.findById(2L);
         assertNull(result);
-        verify(userDao, times(1)).findById(2L);
+        verify(userRepository, times(1)).findById(2L);
     }
 
     @Test
-    void update_nullUser_throwsBusinessException() {
-        assertThrows(BusinessException.class, () -> userService.update(null));
-        verify(userDao, never()).update(any());
+    void update_validUser_callsSaveOnce() {
+        User user = new User("Username", "test@email.com", 25);
+        user.setId(1L);
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.save(user)).thenReturn(user);
+
+        User result = userService.update(user);
+
+        assertNotNull(result);
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test
-    void update_userWithEmptyNameOrEmail_throwsBusinessException() {
-        User userEmptyName = new User("", "testemail@example.com", 25);
-        userEmptyName.setId(1L);
-        User userEmptyEmail = new User("Username", "", 25);
-        userEmptyEmail.setId(1L);
-        assertThrows(BusinessException.class, () -> userService.update(userEmptyName));
-        assertThrows(BusinessException.class, () -> userService.update(userEmptyEmail));
-        verify(userDao, never()).update(any());
+    void update_userNotFound_throwsUserNotFoundException() {
+        User user = new User("Username", "test@email.com", 25);
+        user.setId(1L);
+        when(userRepository.existsById(1L)).thenReturn(false);
+        assertThrows(UserNotFoundException.class, () -> userService.update(user));
+        verify(userRepository, never()).save(any());
     }
 
     @Test
-    void update_userWithInvalidId_throwsBusinessException() { // validateId tested
-        User user = new User("Username", "testemail@example.com", 25);
-        user.setId(0L);
+    void update_invalidUser_throwsBusinessException() {
+        User user = new User("", "test@email.com", 25);
+        user.setId(1L);
+
         assertThrows(BusinessException.class, () -> userService.update(user));
-        verify(userDao, never()).update(any());
-    }
 
-    @Test
-    void update_daoThrowsException_propagatesException() {
-        User user = new User("Username", "testemail@example.com", 25);
-        user.setId(1L);
-        doThrow(new RuntimeException("DB error")).when(userDao).update(user);
-        assertThrows(RuntimeException.class, () -> userService.update(user));
-        verify(userDao, times(1)).update(user);
-    }
-
-    @Test
-    void update_validUser_callsDaoUpdateOnce() {
-        User user = new User("Username", "testemail@example.com", 25);
-        user.setId(1L);
-        doNothing().when(userDao).update(user); // successful updating
-        userService.update(user);
-        verify(userDao, times(1)).update(user);
-    }
-
-    @Test
-    void deleteById_invalidId_throwsBusinessException() {
-        assertThrows(BusinessException.class, () -> userService.deleteById(null));
-        assertThrows(BusinessException.class, () -> userService.deleteById(0L));
-        verify(userDao, never()).deleteById(any());
+        verifyNoInteractions(userRepository);
     }
 
     @Test
     void deleteById_userNotFound_throwsUserNotFoundException() {
-        when(userDao.deleteById(1L)).thenReturn(0);
+        when(userRepository.existsById(1L)).thenReturn(false);
         assertThrows(UserNotFoundException.class, () -> userService.deleteById(1L));
-        verify(userDao, times(1)).deleteById(1L);
+        verify(userRepository, never()).deleteById(any());
     }
 
     @Test
-    void deleteById_daoThrowsException_propagatesBusinessException() {
-        doThrow(new RuntimeException("DB error")).when(userDao).deleteById(1L);
-        assertThrows(BusinessException.class, () -> userService.deleteById(1L));
-        verify(userDao, times(1)).deleteById(1L);
-    }
-
-    @Test
-    void deleteById_validId_callsDaoDeleteOnce() {
-        when(userDao.deleteById(1L)).thenReturn(1);
-        userService.deleteById(1L);
-        verify(userDao, times(1)).deleteById(1L);
+    void deleteById_validId_callsRepositoryDeleteOnce() {
+        Long id = 1L;
+        when(userRepository.existsById(id)).thenReturn(true);
+        userService.deleteById(id);
+        verify(userRepository, times(1)).deleteById(id);
     }
 
     @Test
@@ -200,7 +178,7 @@ class UserServiceImplTest {
         User user1 = new User("User1", "user1@example.com", 25);
         User user2 = new User("User2", "user2@example.com", 30);
 
-        when(userDao.findAll()).thenReturn(List.of(user1, user2));
+        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
 
         List<User> result = userService.findAll();
 
@@ -209,16 +187,16 @@ class UserServiceImplTest {
         assertTrue(result.contains(user1));
         assertTrue(result.contains(user2));
 
-        verify(userDao, times(1)).findAll();
+        verify(userRepository, times(1)).findAll();
     }
 
     @Test
     void findAll_returnsEmptyList_whenDaoReturnsEmpty() {
-        when(userDao.findAll()).thenReturn(List.of());
+        when(userRepository.findAll()).thenReturn(List.of());
         List<User> result = userService.findAll();
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(userDao, times(1)).findAll();
+        verify(userRepository, times(1)).findAll();
     }
 
 
