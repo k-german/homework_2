@@ -119,10 +119,9 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findById_nonExistingUser_returnsNull() {
+    void findById_nonExistingUser_throwsUserNotFoundException() {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
-        User result = userService.findById(2L);
-        assertNull(result);
+        assertThrows(UserNotFoundException.class, () -> userService.findById(2L));
         verify(userRepository, times(1)).findById(2L);
     }
 

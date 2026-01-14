@@ -10,14 +10,14 @@ import lombok.Setter;
 @Getter
 public class UserRequestDto {
 
-    @NotBlank
+    @NotBlank(message = "name must not be blank")
     private String name;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "email must not be blank")
+    @Email(message = "is not valid")
     private String email;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "must be >= 0")
     private Integer age;
 
 }

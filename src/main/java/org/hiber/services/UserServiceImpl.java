@@ -46,9 +46,7 @@ public class UserServiceImpl implements UserService {
     public User findById(Long id) {
         logger.debug("public User findById(Long id) - started, id: {}", id);
         validateId(id);
-        User result = userRepository.findById(id).orElse(null);
-        logger.debug("public User findById(Long id) - exiting, user: {}", result);
-        return result;
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Override
