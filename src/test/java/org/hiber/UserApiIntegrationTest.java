@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import org.springframework.http.MediaType;
 
@@ -90,4 +91,40 @@ public class UserApiIntegrationTest {
                 .andExpect(jsonPath("$.email").value("alice@test.com"))
                 .andExpect(jsonPath("$.age").value(25));
     }
+
+    @Test
+    void shouldUpdateUser() throws Exception {
+        UserRequestDto createRequest = new UserRequestDto();
+        createRequest.setName("Bob");
+        createRequest.setEmail("bob@test.com");
+        createRequest.setAge(40);
+
+        String createResponse = mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long userId = objectMapper
+                .readTree(createResponse)
+                .get("id")
+                .asLong();
+
+        UserRequestDto updateRequest = new UserRequestDto();
+        updateRequest.setName("Bob Updated");
+        updateRequest.setEmail("bob.updated@test.com");
+        updateRequest.setAge(41);
+
+        mockMvc.perform(put("/api/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.name").value("Bob Updated"))
+                .andExpect(jsonPath("$.email").value("bob.updated@test.com"))
+                .andExpect(jsonPath("$.age").value(41));
+    }
+
 }
