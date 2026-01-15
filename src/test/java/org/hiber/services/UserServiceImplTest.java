@@ -49,7 +49,6 @@ class UserServiceImplTest {
     @Test
     void deleteById_validId_successfulDeletion() {
         long validId = 22;
-        when(userRepository.existsById(validId)).thenReturn(true);
         userService.deleteById(validId);
         verify(userRepository).deleteById(validId);
     }
@@ -158,16 +157,8 @@ class UserServiceImplTest {
     }
 
     @Test
-    void deleteById_userNotFound_throwsUserNotFoundException() {
-        when(userRepository.existsById(1L)).thenReturn(false);
-        assertThrows(UserNotFoundException.class, () -> userService.deleteById(1L));
-        verify(userRepository, never()).deleteById(any());
-    }
-
-    @Test
     void deleteById_validId_callsRepositoryDeleteOnce() {
         Long id = 1L;
-        when(userRepository.existsById(id)).thenReturn(true);
         userService.deleteById(id);
         verify(userRepository, times(1)).deleteById(id);
     }

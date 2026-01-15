@@ -86,13 +86,6 @@ public class UserServiceImpl implements UserService {
         } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
             logger.info("deleteById(Long id) - fail, user not found. id: {}", id);
         }
-//        if (!userRepository.existsById(id)) {
-//            logger.warn("deleteById(Long id) - failed.");
-//            throw new UserNotFoundException(id);
-//        }
-//
-//        userRepository.deleteById(id);
-//        logger.info("deleteById(Long id) - success, id: {}", id);
     }
 
     private void validateUser(User user) {
