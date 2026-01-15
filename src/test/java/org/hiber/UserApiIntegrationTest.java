@@ -153,4 +153,30 @@ public class UserApiIntegrationTest {
         mockMvc.perform(get("/api/users/{id}", userId)).andExpect(status().isNotFound());
     }
 
+    @Test
+    void shouldReturn404WhenUserNotFound() throws Exception {
+        mockMvc.perform(get("/api/users/{id}", 99999L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn404WhenDeletingNonExistingUser() throws Exception {
+        mockMvc.perform(delete("/api/users/{id}", 99999L))
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    void shouldReturn404WhenUpdatingNonExistingUser() throws Exception {
+        UserRequestDto request = new UserRequestDto();
+        request.setName("Ghost");
+        request.setEmail("ghost@test.com");
+        request.setAge(100);
+
+        mockMvc.perform(put("/api/users/{id}", 99999L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
 }
