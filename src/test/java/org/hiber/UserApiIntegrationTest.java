@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.springframework.http.MediaType;
 
@@ -60,5 +61,33 @@ public class UserApiIntegrationTest {
                 .andExpect(jsonPath("$.name").value("John"))
                 .andExpect(jsonPath("$.email").value("john@test.com"))
                 .andExpect(jsonPath("$.age").value(30));
+    }
+
+    @Test
+    void shouldGetUserById() throws Exception {
+        UserRequestDto request = new UserRequestDto();
+        request.setName("Alice");
+        request.setEmail("alice@test.com");
+        request.setAge(25);
+
+        String createResponse = mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long userId = objectMapper
+                .readTree(createResponse)
+                .get("id")
+                .asLong();
+
+        mockMvc.perform(get("/api/users/{id}", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.name").value("Alice"))
+                .andExpect(jsonPath("$.email").value("alice@test.com"))
+                .andExpect(jsonPath("$.age").value(25));
     }
 }
