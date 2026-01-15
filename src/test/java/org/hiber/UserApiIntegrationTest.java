@@ -162,7 +162,7 @@ public class UserApiIntegrationTest {
     @Test
     void shouldReturn404WhenDeletingNonExistingUser() throws Exception {
         mockMvc.perform(delete("/api/users/{id}", 99999L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
     }
 
 

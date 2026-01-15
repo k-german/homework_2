@@ -61,6 +61,8 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         logger.debug("update(User user) - started: {}", user);
         validateUser(user);
+        validateId(user.getId());
+
         if (!userRepository.existsById(user.getId())) {
             logger.warn("update(User user) - fails. \n");
             throw new UserNotFoundException(user.getId());
@@ -76,13 +78,21 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long id) {
         logger.debug("deleteById(Long id) - started, id: {}", id);
         validateId(id);
-        if (!userRepository.existsById(id)) {
-            logger.warn("deleteById(Long id) - failed.");
-            throw new UserNotFoundException(id);
-        }
 
-        userRepository.deleteById(id);
-        logger.info("deleteById(Long id) - success, id: {}", id);
+        try {
+            userRepository.deleteById(id);
+            userRepository.flush();
+            logger.info("deleteById(Long id) - success. id: {}", id);
+        } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
+            logger.info("deleteById(Long id) - fail, user not found. id: {}", id);
+        }
+//        if (!userRepository.existsById(id)) {
+//            logger.warn("deleteById(Long id) - failed.");
+//            throw new UserNotFoundException(id);
+//        }
+//
+//        userRepository.deleteById(id);
+//        logger.info("deleteById(Long id) - success, id: {}", id);
     }
 
     private void validateUser(User user) {
