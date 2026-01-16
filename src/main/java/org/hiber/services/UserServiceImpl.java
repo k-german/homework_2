@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findById(Long id) {
         logger.debug("public User findById(Long id) - started, id: {}", id);
         validateId(id);
@@ -50,10 +51,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> findAll() {
         logger.debug("public List<User> findAll() - started");
         List<User> result = userRepository.findAll();
-        logger.debug("public List<User> findAll() started - exiting users count: {}", result.size());
+        logger.debug("public List<User> findAll() - exiting users count: {}", result.size());
         return result;
     }
 
