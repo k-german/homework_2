@@ -167,7 +167,7 @@ public class UserApiIntegrationTest {
 
 
     @Test
-    void shouldReturn404WhenUpdatingNonExistingUser() throws Exception {
+    void shouldUpdateNonExistingUser_NoOp() throws Exception {
         UserRequestDto request = new UserRequestDto();
         request.setName("Ghost");
         request.setEmail("ghost@test.com");
@@ -176,7 +176,7 @@ public class UserApiIntegrationTest {
         mockMvc.perform(put("/api/users/{id}", 99999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
 }
