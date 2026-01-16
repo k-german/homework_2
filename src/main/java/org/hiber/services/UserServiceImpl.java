@@ -38,7 +38,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         logger.info("create(User user) - successful exiting: {}", user);
-        logger.debug("create(User user) - successful exiting: {}", user);
         return user;
     }
 
@@ -73,7 +72,7 @@ public class UserServiceImpl implements UserService {
         );
 
         if (updated == 0) {
-            logger.info("update - fails, user not found. id={}", user.getId());
+            logger.debug("update - fails, user not found. id={}", user.getId());
         } else {
             logger.info("update(User user) - successful exiting: {}", user);
         }
@@ -91,7 +90,7 @@ public class UserServiceImpl implements UserService {
             userRepository.flush();
             logger.info("deleteById(Long id) - success. id: {}", id);
         } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            logger.info("deleteById(Long id) - fail, user not found. id: {}", id);
+            logger.debug("deleteById(Long id) - fail, user not found. id: {}", id);
         }
     }
 
