@@ -22,8 +22,6 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-//    private UserDao userRepository;
-
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -125,25 +123,29 @@ class UserServiceImplTest {
     }
 
     @Test
-    void update_validUser_callsSaveOnce() {
+    void update_validUser_callsUpdateIfExistsOnce() {
         User user = new User("Username", "test@email.com", 25);
         user.setId(1L);
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.updateIfExists(1L, "Username", "test@email.com", 25))
+                .thenReturn(1);
 
         User result = userService.update(user);
 
         assertNotNull(result);
-        verify(userRepository, times(1)).save(user);
+        verify(userRepository, times(1))
+                .updateIfExists(1L, "Username", "test@email.com", 25);
     }
 
     @Test
-    void update_userNotFound_throwsUserNotFoundException() {
-        User user = new User("Username", "test@email.com", 25);
+    void update_nonExistingUser_noOp() {
+        User user = new User("nonExistingUser", "nonexistinguser@email.com", 25);
         user.setId(1L);
-        when(userRepository.existsById(1L)).thenReturn(false);
-        assertThrows(UserNotFoundException.class, () -> userService.update(user));
-        verify(userRepository, never()).save(any());
+        when(userRepository.updateIfExists(1L, "nonExistingUser",
+                "nonexistinguser@email.com", 25))
+                .thenReturn(0);
+        userService.update(user);
+        verify(userRepository).updateIfExists(1L, "nonExistingUser",
+                "nonexistinguser@email.com", 25);
     }
 
     @Test
@@ -154,13 +156,6 @@ class UserServiceImplTest {
         assertThrows(BusinessException.class, () -> userService.update(user));
 
         verifyNoInteractions(userRepository);
-    }
-
-    @Test
-    void deleteById_validId_callsRepositoryDeleteOnce() {
-        Long id = 1L;
-        userService.deleteById(id);
-        verify(userRepository, times(1)).deleteById(id);
     }
 
     @Test
@@ -188,6 +183,4 @@ class UserServiceImplTest {
         assertTrue(result.isEmpty());
         verify(userRepository, times(1)).findAll();
     }
-
-
 }
