@@ -38,11 +38,11 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         logger.info("create(User user) - successful exiting: {}", user);
-        logger.debug("create(User user) - successful exiting: {}", user);
         return user;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findById(Long id) {
         logger.debug("public User findById(Long id) - started, id: {}", id);
         validateId(id);
@@ -50,10 +50,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> findAll() {
         logger.debug("public List<User> findAll() - started");
         List<User> result = userRepository.findAll();
-        logger.debug("public List<User> findAll() started - exiting users count: {}", result.size());
+        logger.debug("public List<User> findAll() - exiting users count: {}", result.size());
         return result;
     }
 
@@ -71,7 +72,7 @@ public class UserServiceImpl implements UserService {
         );
 
         if (updated == 0) {
-            logger.info("update - fails, user not found. id={}", user.getId());
+            logger.debug("update - fails, user not found. id={}", user.getId());
         } else {
             logger.info("update(User user) - successful exiting: {}", user);
         }
@@ -89,7 +90,7 @@ public class UserServiceImpl implements UserService {
             userRepository.flush();
             logger.info("deleteById(Long id) - success. id: {}", id);
         } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            logger.info("deleteById(Long id) - fail, user not found. id: {}", id);
+            logger.debug("deleteById(Long id) - fail, user not found. id: {}", id);
         }
     }
 

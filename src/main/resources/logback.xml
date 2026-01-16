@@ -36,9 +36,6 @@
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
-        </filter>
     </appender>
 
     <logger name="org.hiber" level="INFO" additivity="false">
@@ -49,7 +46,6 @@
         <appender-ref ref="FILE_DEBUG"/>
     </logger>
 
-    <root level="Error">
-        <appender-ref ref="FILE_INFO"/>
-    </root>
+    <root level="Error"/>
+
 </configuration>
