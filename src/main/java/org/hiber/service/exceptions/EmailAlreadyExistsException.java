@@ -1,4 +1,4 @@
-package org.hiber.services.exceptions;
+package org.hiber.service.exceptions;
 
 public class EmailAlreadyExistsException extends BusinessException {
     public EmailAlreadyExistsException(String email) {

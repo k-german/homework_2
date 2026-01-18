@@ -1,6 +1,6 @@
 package org.hiber;
 
-import org.hiber.services.UserService;
+import org.hiber.service.UserService;
 import org.hiber.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

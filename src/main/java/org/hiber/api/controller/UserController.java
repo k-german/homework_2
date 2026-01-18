@@ -5,7 +5,7 @@ import org.hiber.api.dto.UserRequestDto;
 import org.hiber.api.dto.UserResponseDto;
 import org.hiber.api.mapper.UserMapper;
 import org.hiber.entity.User;
-import org.hiber.services.UserService;
+import org.hiber.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

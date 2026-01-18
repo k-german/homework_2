@@ -1,4 +1,4 @@
-package org.hiber.services.exceptions;
+package org.hiber.service.exceptions;
 
 public class BusinessException extends RuntimeException {
     public BusinessException(String message) {
