@@ -1,10 +1,10 @@
-package org.hiber.services;
+package org.hiber.service;
 
 import org.hiber.entity.User;
 import org.hiber.repository.UserRepository;
-import org.hiber.services.exceptions.BusinessException;
-import org.hiber.services.exceptions.EmailAlreadyExistsException;
-import org.hiber.services.exceptions.UserNotFoundException;
+import org.hiber.service.exceptions.BusinessException;
+import org.hiber.service.exceptions.EmailAlreadyExistsException;
+import org.hiber.service.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
