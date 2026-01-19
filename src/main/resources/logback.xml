@@ -42,7 +42,7 @@
         <appender-ref ref="FILE_INFO"/>
     </logger>
 
-    <logger name="org.hiber.services" level="DEBUG" additivity="false">
+    <logger name="org.hiber.service" level="DEBUG" additivity="false">
         <appender-ref ref="FILE_DEBUG"/>
     </logger>
 

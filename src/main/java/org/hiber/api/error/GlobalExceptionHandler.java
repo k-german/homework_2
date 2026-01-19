@@ -1,10 +1,9 @@
 package org.hiber.api.error;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
-import org.hiber.services.exceptions.BusinessException;
-import org.hiber.services.exceptions.EmailAlreadyExistsException;
-import org.hiber.services.exceptions.UserNotFoundException;
+import org.hiber.service.exceptions.BusinessException;
+import org.hiber.service.exceptions.EmailAlreadyExistsException;
+import org.hiber.service.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

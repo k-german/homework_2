@@ -1,4 +1,4 @@
-package org.hiber.services;
+package org.hiber.service;
 
 import org.hiber.entity.User;
 
