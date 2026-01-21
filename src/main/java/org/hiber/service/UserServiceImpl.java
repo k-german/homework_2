@@ -10,20 +10,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.hiber.kafka.dto.OperationType;
+import org.hiber.kafka.dto.UserNotificationEvent;
+import org.hiber.kafka.producer.UserNotificationProducer;
+
 import java.util.List;
 
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    private final UserNotificationProducer notificationProducer;
+
     private final UserRepository userRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-//    private final UserDao userDao;
-
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserNotificationProducer notificationProducer) {
         this.userRepository = userRepository;
+        this.notificationProducer = notificationProducer;
     }
 
     @Override
@@ -38,6 +43,9 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         logger.info("create(User user) - successful exiting: {}", user);
+
+        notificationProducer.send(new UserNotificationEvent(OperationType.CREATE, user.getEmail()));
+        logger.info("notificationProducer send CREATE message");
         return user;
     }
 
@@ -84,14 +92,13 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long id) {
         logger.debug("deleteById(Long id) - started, id: {}", id);
         validateId(id);
-
-        try {
-            userRepository.deleteById(id);
-            userRepository.flush();
-            logger.info("deleteById(Long id) - success. id: {}", id);
-        } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            logger.debug("deleteById(Long id) - fail, user not found. id: {}", id);
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        String email = user.getEmail();
+        logger.info("User has been found and his email has been received: {}", email);
+        userRepository.delete(user);
+        logger.info("User has been deleted, id: {}", id);
+        notificationProducer.send(new UserNotificationEvent(OperationType.DELETE, email));
+        logger.info("notificationProducer send DELETE message");
     }
 
     private void validateUser(User user) {

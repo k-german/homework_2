@@ -1,6 +1,7 @@
 package org.hiber.service;
 
 import org.hiber.entity.User;
+import org.hiber.kafka.producer.UserNotificationProducer;
 import org.hiber.repository.UserRepository;
 import org.hiber.service.exceptions.BusinessException;
 import org.hiber.service.exceptions.EmailAlreadyExistsException;
@@ -19,6 +20,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
+
+    @Mock
+    private UserNotificationProducer notificationProducer;
 
     @Mock
     private UserRepository userRepository;
@@ -47,8 +51,12 @@ class UserServiceImplTest {
     @Test
     void deleteById_validId_successfulDeletion() {
         long validId = 22;
+        User user = new User("Test", "test@test.com", 25);
+        user.setId(validId);
+        when(userRepository.findById(validId)).thenReturn(Optional.of(user));
         userService.deleteById(validId);
-        verify(userRepository).deleteById(validId);
+        verify(userRepository).delete(user);
+        verify(notificationProducer).send(any());
     }
 
     @Test
