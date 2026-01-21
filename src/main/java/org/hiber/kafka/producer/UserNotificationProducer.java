@@ -1,10 +1,12 @@
 package org.hiber.kafka.producer;
 
 import org.hiber.kafka.dto.UserNotificationEvent;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!test")
 public class UserNotificationProducer {
 
     private static final String TOPIC = "user.notifications";

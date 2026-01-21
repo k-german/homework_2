@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteById(Long id) {
         logger.debug("deleteById(Long id) - started, id: {}", id);
+        validateId(id);
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         String email = user.getEmail();
         logger.info("User has been found and his email has been received: {}", email);
