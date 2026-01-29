@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class TestUserNotificationProducer extends UserNotificationProducer {
 
     public TestUserNotificationProducer() {
-        super(null);
+        super(null, null);
     }
 
     @Override
