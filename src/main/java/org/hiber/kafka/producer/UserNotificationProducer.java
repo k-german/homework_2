@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 @Profile("!test")
 public class UserNotificationProducer {
 
-//    private static final String TOPIC = "user.notifications";
-
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
